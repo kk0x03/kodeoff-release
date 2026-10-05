@@ -1,0 +1,44 @@
+# GitHub Pages 部署模板（Kodeoff 官网）
+#
+# 用法：把本文件拷贝为仓库根目录的 .github/workflows/pages.yml，
+# 然后在 GitHub 仓库 Settings → Pages → Build and deployment →
+# Source 选择 "GitHub Actions"。之后 push 到 main（website/ 有改动时）
+# 即自动把 website/ 目录发布为站点，地址 https://kk0x03.github.io/kodeoff-release/。
+#
+# 站点为纯静态零依赖（无构建步骤），直接上传 website/ 目录即可。
+
+name: Deploy website to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['website/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload site (website/)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

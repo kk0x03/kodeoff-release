@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kodeoff · 拖住文件停一下，轮盘即现</title>
+<meta name="description" content="Kodeoff 是 macOS 拖拽轮盘桌面工具：拖住文件停一下，光标处弹出 10 扇区轮盘，滑向扇区松手即执行。发手机三通道中现仅 AirDrop 可用（iCloud 通道未实测、自托管中转接入中）；全程纯公开 API，无需辅助功能权限。">
+<meta name="theme-color" content="#0b0e14">
+<meta property="og:title" content="Kodeoff · 拖住文件停一下，轮盘即现">
+<meta property="og:description" content="拖住文件停一下，轮盘即现；滑向扇区，松手即执行。10 个扇区动作、无需辅助功能权限的 macOS 拖拽轮盘工具；发手机三通道现仅 AirDrop 可用（iCloud 未实测、自托管接入中）。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kk0x03.github.io/kodeoff-release/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="./assets/style.css">
+<script src="./assets/app.js" defer></script>
+</head>
+<body id="top">
+<a class="skip" href="#main">跳到主要内容</a>
+<header class="site-head">
+<nav class="nav" aria-label="页面导航">
+<a class="brand" href="#top"><span class="brand-dot" aria-hidden="true"></span>Kodeoff<span class="brand-platform">FOR MAC</span></a>
+<div class="nav-links"><a href="#features">功能</a><a href="#platform">平台</a><a href="#phone">文件分享</a><a href="#security">隐私</a><a href="#faq">FAQ</a></div>
+<div class="nav-actions"><a class="nav-cta" href="#download">发布进展 <span aria-hidden="true">↗</span></a><button class="menu-toggle" type="button" aria-expanded="false" aria-label="展开导航">菜单</button></div>
+</nav>
+</header>
+<main id="main">
+<section class="hero" aria-label="产品简介">
+<div class="hero-grid">
+<div class="hero-copy">
+<p class="kicker"><span class="status-dot"></span> 为每一次文件操作，少走几步</p>
+<h1><span class="line">停一下。</span><span class="line">顺手，<em>就好。</em></span></h1>
+<p class="hero-sub">拖住文件，常用操作就在光标旁。<br>打开、复制、编辑、分享——<br class="mobile-break">滑向你要的，松手即完成。</p>
+<div class="hero-cta"><a class="btn btn-primary" href="#download">查看发布进展 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"></path></svg></a><a class="btn btn-ghost" href="#features">探索功能 <span aria-hidden="true">↓</span></a></div>
+<p class="hero-note">适用于 macOS 13+ · 安装包尚未发布</p>
+<ul class="hero-facts"><li>无需辅助功能权限</li><li>10 个可选动作</li><li>原生 macOS 体验</li></ul>
+</div>
+<div class="hero-demo">
+<div class="demo-window">
+<div class="demo-toolbar"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>你的下一步，就在手边</span><span class="demo-tag">交互预览</span></div>
+<div class="demo-desktop"><div class="demo-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H5v20h14V7zM14 2v5h5m-10 5h6m-6 4h6"></path></svg><span>项目设计稿.md<small>正在拖动的文件</small></span></div>
+<div class="radial-demo"><div class="radial-stage"><div class="radial-wheel"><div class="radial-base"></div><div class="radial-hl"></div><div class="radial-hub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H5v20h14V7zM14 2v5h5m-10 5h6m-6 4h6"></path></svg></div><button class="radial-label" type="button" style="--a:0deg" data-index="0" data-detail="在 VSCode 中打开项目" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"></path></svg><span>VSCode</span></button>
+<button class="radial-label is-target" type="button" style="--a:36deg" data-index="1" data-detail="项目设计稿.md 的路径已复制" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg><span>复制路径</span></button>
+<button class="radial-label" type="button" style="--a:72deg" data-index="2" data-detail="iCloud 通道待真机验证" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M10 18h4"></path></svg><span>发手机</span></button>
+<button class="radial-label" type="button" style="--a:108deg" data-index="3" data-detail="通过系统隔空投送分享文件" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg><span>AirDrop</span></button>
+<button class="radial-label" type="button" style="--a:144deg" data-index="4" data-detail="选择你习惯使用的应用" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><span>打开方式</span></button>
+<button class="radial-label" type="button" style="--a:180deg" data-index="5" data-detail="直接编辑文本，⌘S 保存" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14z"></path></svg><span>快捷编辑</span></button>
+<button class="radial-label" type="button" style="--a:216deg" data-index="6" data-detail="在当前目录创建同格式文件" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H5v20h14V7zM14 2v5h5m-7 4v7m-3-3.5h6"></path></svg><span>新建同类</span></button>
+<button class="radial-label" type="button" style="--a:252deg" data-index="7" data-detail="在 Finder 中定位文件" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span>Finder</span></button>
+<button class="radial-label" type="button" style="--a:288deg" data-index="8" data-detail="在终端中打开所在目录" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"></rect><path d="m6 9 3 3-3 3m6 0h5"></path></svg><span>终端</span></button>
+<button class="radial-label" type="button" style="--a:324deg" data-index="9" data-detail="调整轮盘动作与触发手感" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"></path></svg><span>设置</span></button></div></div></div>
+<div class="demo-status" aria-live="polite"><span class="demo-status-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg></span><span class="demo-status-text">项目设计稿.md 的路径已复制</span></div></div>
+<div class="demo-footer"><span><span class="status-dot"></span> 轮盘已就绪</span><span>悬停或点选扇区，体验操作</span></div>
+</div>
+<p class="demo-disclaimer">界面交互示意 · 不会操作你的文件</p>
+</div>
+</div>
+<div class="workflow"><div><span>01</span><p>拖住文件<small>从熟悉的 Finder 开始</small></p></div><b aria-hidden="true">→</b><div><span>02</span><p>稍作停顿<small>默认 300ms，即刻唤起</small></p></div><b aria-hidden="true">→</b><div><span>03</span><p>滑向动作，松手<small>让手上的操作顺势完成</small></p></div></div>
+</section>
+<section class="section" id="features">
+<div class="section-head"><p class="eyebrow">少一点来回，多一点专注</p><h2>文件在手，<br>下一步也在。</h2><p class="section-lead">把频繁用到的操作，放到一次拖拽里。<br>不用记新快捷键，也不用在窗口之间来回找。</p></div>
+<div class="feature-grid">
+<article class="feature-card feature-wide"><div class="feature-copy"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"></path></svg></span><h3>项目，直接打开。</h3><p>拖住文件或文件夹，顺手交给 VSCode、终端，或你常用的应用。</p></div><div class="mini-apps" aria-hidden="true"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"></path></svg><small>VSCode</small></span><i>↗</i><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"></rect><path d="m6 9 3 3-3 3m6 0h5"></path></svg><small>Terminal</small></span><i>↗</i><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><small>Finder</small></span></div></article>
+<article class="feature-card"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg></span><h3>路径，一拖就有。</h3><p>复制 POSIX 路径、文件 URI，或带引号的路径。</p><div class="path-preview"><code>~/Projects/idea.md</code><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg></div></article>
+<article class="feature-card"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14z"></path></svg></span><h3>小改动，轻松完成。</h3><p>文本直接编辑，其他文件快速改名。新建同格式文件也只需一拖。</p><div class="editor-preview"><span>idea.md <b>⌘ S</b></span><code><i>1</i> # 下一个好点子<span class="caret"></span></code></div></article>
+<article class="feature-card feature-wide feature-share"><div class="feature-copy"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg></span><h3>文件分享，顺势发生。</h3><p>用 AirDrop 把文件送到附近设备。更多跨设备通道正在接入。</p><a class="text-link" href="#phone">了解分享方式 <span aria-hidden="true">↗</span></a></div><div class="share-preview" aria-hidden="true"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H5v20h14V7zM14 2v5h5m-10 5h6m-6 4h6"></path></svg></span><i>······</i><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M10 18h4"></path></svg></span></div></article>
+</div>
+<details class="technical-details"><summary>查看全部 10 个扇区动作 <span>按需开关，自由取舍</span></summary><div class="table-wrap">
+<table>
+<thead>
+<tr><th scope="col">扇区</th><th scope="col">行为</th></tr>
+</thead>
+<tbody>
+<tr><td>VSCode 打开</td><td>未安装 VSCode 时置灰</td></tr>
+<tr><td>复制路径</td><td>默认 POSIX，设置里可切 <code>file://</code> URI / 带引号</td></tr>
+<tr><td>发送到手机</td><td>拖住单个文件松手，经你的 iCloud 私有库发往手机端 Kodeoff（两端登录同一 Apple ID 即收）；多选 / 文件夹 / 未登录 iCloud / 构建未携带 iCloud entitlement 时置灰。CloudKit 真机链路与 iOS 收件端未经真机验证（iOS App 已落码、未编译分发）</td></tr>
+<tr><td>AirDrop</td><td>系统隔空投送，多选可用；iCloud 不可用或空间不足时的显式兜底</td></tr>
+<tr><td>打开方式…</td><td>二级环列出所有声明支持该类型的 App（点选）</td></tr>
+<tr><td>快捷编辑</td><td>文本文件进入内联迷你编辑器（⌘S 保存）；非文本 / 文件夹则重命名</td></tr>
+<tr><td>新建同格式</td><td>文件在父目录新建同扩展名空文件；文件夹新建同级空文件夹（自动编号）</td></tr>
+<tr><td>Finder 中显示</td><td>定位选中</td></tr>
+<tr><td>终端打开</td><td>文件夹直接打开，文件打开其所在目录</td></tr>
+<tr><td>设置</td><td>触发停顿时长、路径格式、扇区开关、开机自启</td></tr>
+</tbody>
+</table>
+</div></details>
+<div class="quiet-features"><p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg> <span>中心松手取消</span></p><p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg> <span>触发时长与半径可调</span></p><p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg> <span>触觉与完成提示可选</span></p></div>
+</section>
+<section class="section" id="platform">
+<div class="section-head"><p class="eyebrow">为桌面而生</p><h2>熟悉的平台，<br>更顺手的操作。</h2><p class="section-lead">从 macOS 开始，把拖拽的习惯延伸到更多桌面。</p></div>
+<div class="card-grid duo">
+<article class="card platform-card"><div class="card-row"><span class="platform-symbol">⌘</span><span class="badge b-ok">原生 macOS</span></div><h3>Mac，先行一步。</h3><p>macOS 13+，集成 Finder、终端与 AirDrop。轮盘停在光标附近，保持熟悉的拖拽节奏。</p><div class="platform-bottom"><span>安装包尚未发布</span><a class="text-link" href="#download">发布进展 ↗</a></div></article>
+<article class="card platform-card"><div class="card-row"><span class="windows-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="badge b-beta">实验性构建版</span></div><h3>Windows，正在路上。</h3><p>面向 Windows 10+ 的 x64 构建版已产出，支持五个常用动作。未经真机验证，运行体验仍待确认。</p><div class="platform-bottom"><span>安装包尚未发布</span><span class="muted">持续完善中</span></div></article>
+</div>
+</section>
+<section class="section" id="phone">
+<div class="section-head"><p class="eyebrow">从桌面，到下一台设备</p><h2>分享文件，<br>选择适合你的方式。</h2><p class="section-lead">AirDrop 现在可用。iCloud 与自托管通道仍在完善，状态在这里清楚呈现。</p></div>
+<div class="card-grid trio">
+<article class="card"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg></span><div class="card-row"><h3>AirDrop</h3><span class="badge b-ok">现已可用</span></div><p>通过系统隔空投送发送到附近设备，支持多选。直接选中轮盘里的 AirDrop 即可开始。</p><span class="card-foot">系统直投 · 近场分享</span></article>
+<article class="card"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M10 18h4"></path></svg></span><div class="card-row"><h3>iCloud 同步</h3><span class="badge b-beta">待验证</span></div><p>设计为经你的 iCloud 私有库同步到手机。CloudKit 链路与 iOS 收件端尚未经真机验证，需 Apple 开发者签名的正式构建。</p><span class="card-foot">iOS 安装包尚未分发</span></article>
+<article class="card"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"></rect><path d="m6 9 3 3-3 3m6 0h5"></path></svg></span><div class="card-row"><h3>自托管中转</h3><span class="badge b-beta">接入中</span></div><p>使用你自己部署的服务器连接设备。本机协议联调已通过，应用内接入与公网部署仍在进行。</p><span class="card-foot">由你管理服务器</span></article>
+</div>
+</section>
+<section class="section" id="security">
+<div class="privacy-intro"><span class="privacy-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 8 4v6c0 5-8 10-8 10S4 17 4 12V6z"></path><path d="m8 11 3 3 5-5"></path></svg></span><div class="section-head"><p class="eyebrow">文件去哪里，说清楚</p><h2>让每次操作，心里有数。</h2><p class="section-lead">复制路径、编辑、新建等本地动作不触网。分享时，文件按你选择的通道传输。</p></div></div>
+<div class="privacy-points"><div><h3>本地操作，留在本机</h3><p>无需辅助功能权限，通过系统公开 API 完成拖放。</p></div><div><h3>通道由你选择</h3><p>AirDrop 系统直投；iCloud 使用你的私有库；自托管使用你的服务器。</p></div><div><h3>加密状态，明确说明</h3><p>端到端加密未上线。加密信封已实现、通道接入进行中。</p></div></div>
+<details class="technical-details"><summary>查看各通道的安全与存储说明 <span>传输 · 存储 · 明文可见范围</span></summary><div class="table-wrap">
+<table>
+<thead>
+<tr><th scope="col">通道</th><th scope="col">传输中</th><th scope="col">静态存储</th><th scope="col">端到端？</th><th scope="col">谁能看到明文</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>iCloud 私有库（CloudKit）</td>
+<td>框架级 TLS（Apple 保证）</td>
+<td>服务器端加密、Apple 持钥；若你开启 iCloud 高级数据保护（ADP），加密字段与资产升级端到端（本项目元数据为普通字段，不在 Apple 点名范围）</td>
+<td>否（保守口径：iCloud 体系内可见）</td>
+<td>iCloud 体系（含 Apple，依你的 iCloud 安全设置而不同）；开发者无服务器、不经手文件</td>
+</tr>
+<tr>
+<td>自托管账号中转</td>
+<td>默认仅本机回环明文 HTTP；服务端可选内置 TLS（--tls-cert/--tls-key，单机 / 内网简路）；跨网生产推荐反向代理终止 TLS</td>
+<td>服务器明文落盘（文件与元数据）；设备 token 仅存哈希</td>
+<td>否——相对 CloudKit 的明确隐私退步</td>
+<td>你的服务器运营方，及无 TLS 链路上的中间人</td>
+</tr>
+<tr>
+<td>AirDrop</td>
+<td>Apple 协议栈系统级加密（不由 Kodeoff 宣称）</td>
+<td>无应用侧落盘，不经手接收端</td>
+<td>不宣称（系统直投）</td>
+<td>收发双方设备的使用者；Kodeoff 不经手</td>
+</tr>
+</tbody>
+</table>
+</div><div class="security-note"><strong>端到端加密尚未接入任何通道。</strong><p>iCloud 体系内（含 Apple，依你的安全设置而不同）可访问；自托管服务器默认明文存储文件，跨网使用需配置 TLS；AirDrop 使用系统协议栈。通道接入与验收完成前，不宣称「仅你可读」。</p></div></details>
+</section>
+<section class="section download-section" id="download">
+<div class="download-intro"><p class="eyebrow">下次拖拽，值得期待</p><h2>让文件操作，<em>顺手一点。</em></h2><p class="section-lead">首个公开 Release 尚未发布。安装包计划通过 GitHub Releases 提供，发布后即可获取。</p></div>
+<div class="dl-grid"><a class="btn btn-primary btn-dl" href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener"><span class="dl-name">macOS <span aria-hidden="true">↗</span></span><span class="dl-sub">13+ · DMG 尚未发布</span></a><a class="btn btn-ghost btn-dl" href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener"><span class="dl-name">Windows <span aria-hidden="true">↗</span></span><span class="dl-sub">Win10+ · ZIP 尚未发布</span></a></div><p class="download-note">上方链接前往 Releases 页面，当前暂无可下载安装包。<br>Windows 构建版未经真机验证 · 代码不开源，授权方案待公布。</p>
+</section>
+<section class="section faq-section" id="faq">
+<div class="section-head"><p class="eyebrow">你可能还想知道</p><h2>常见问题。</h2></div>
+<div class="faq">
+<details><summary>需要授予什么权限？</summary><div class="faq-body"><p>不需要辅助功能权限。Kodeoff 使用系统公开 API 识别文件拖拽与停顿，并将轮盘作为拖放目标。文件访问仍遵循系统的权限设置。</p></div></details>
+<details><summary>什么时候可以下载？收费吗？</summary><div class="faq-body"><p>首个公开 Release 尚未发布，当前没有可下载安装包。代码不开源，授权与收费方案会在正式发布时公布。</p></div></details>
+<details><summary>如何取消一次操作？</summary><div class="faq-body"><p>把光标移回轮盘中心再松手，或将文件拖出轮盘边界。Finder 拖拽本身也可通过 Esc 取消。</p></div></details>
+<details><summary>Windows 版现在能用吗？</summary><div class="faq-body"><p>x64 构建版已产出，面向 Windows 10+，但尚未经真机验证，拖拽检测与动作执行仍待确认。安装包也尚未发布。</p></div></details>
+<details><summary>发送到手机必须登录 iCloud 吗？</summary><div class="faq-body"><p>iCloud 通道需要两端登录同一 Apple ID，并使用携带 iCloud entitlement 的正式构建；该通道与 iOS 收件端尚未经真机验证。附近设备可使用 AirDrop，自托管通道的应用内接入仍在进行。</p></div></details>
+</div>
+</section>
+</main>
+<footer class="site-foot"><div class="foot-inner"><div class="foot-top"><a class="brand" href="#top"><span class="brand-dot" aria-hidden="true"></span>Kodeoff</a><p>停一下。顺手，就好。</p><a href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener">GitHub Releases ↗</a></div><div class="foot-bottom"><span>为顺手的每一天而做。</span><span>v0.1.2 · macOS 13+ · 首个 Release 待发布</span></div></div></footer>
+</body>
+</html>
