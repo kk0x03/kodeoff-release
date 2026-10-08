@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kodeoff · 拖住文件停一下，轮盘即现</title>
-<meta name="description" content="Kodeoff 是 macOS 拖拽轮盘桌面工具：拖住文件停一下，光标处弹出 10 扇区轮盘，滑向扇区松手即执行。发手机三通道中现仅 AirDrop 可用（iCloud 通道未实测、自托管中转接入中）；全程纯公开 API，无需辅助功能权限。">
+<meta name="description" content="Kodeoff 是 macOS 拖拽轮盘桌面工具：拖住文件停一下，光标处弹出 10 扇区轮盘，滑向扇区松手即执行。发手机通道：AirDrop 与自托管中转可用（中转需自建服务端、已本地三端实测），iCloud 通道待开发者签名启用；全程纯公开 API，无需辅助功能权限。">
 <meta name="theme-color" content="#0b0e14">
 <meta property="og:title" content="Kodeoff · 拖住文件停一下，轮盘即现">
-<meta property="og:description" content="拖住文件停一下，轮盘即现；滑向扇区，松手即执行。10 个扇区动作、无需辅助功能权限的 macOS 拖拽轮盘工具；发手机三通道现仅 AirDrop 可用（iCloud 未实测、自托管接入中）。">
+<meta property="og:description" content="拖住文件停一下，轮盘即现；滑向扇区，松手即执行。10 个扇区动作、无需辅助功能权限的 macOS 拖拽轮盘工具；发手机通道：AirDrop 与自托管中转可用（中转需自建服务端），iCloud 待签名启用。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kk0x03.github.io/kodeoff-release/">
 <meta name="twitter:card" content="summary">
@@ -73,7 +73,7 @@
 <tbody>
 <tr><td>VSCode 打开</td><td>未安装 VSCode 时置灰</td></tr>
 <tr><td>复制路径</td><td>默认 POSIX，设置里可切 <code>file://</code> URI / 带引号</td></tr>
-<tr><td>发送到手机</td><td>拖住单个文件松手，经你的 iCloud 私有库发往手机端 Kodeoff（两端登录同一 Apple ID 即收）；多选 / 文件夹 / 未登录 iCloud / 构建未携带 iCloud entitlement 时置灰。CloudKit 真机链路与 iOS 收件端未经真机验证（iOS App 已落码、未编译分发）</td></tr>
+<tr><td>发送到手机</td><td>拖住单个文件松手发往手机端 Kodeoff：iCloud 私有库通道待开发者签名启用（未签名构建可改走自托管中转，需自建服务端并登录）；多选 / 文件夹 / 通道不可用时置灰。iCloud 真机链路未经验证；中转通道已在本地三端实测（iOS App 已可构建安装，未对外分发）</td></tr>
 <tr><td>AirDrop</td><td>系统隔空投送，多选可用；iCloud 不可用或空间不足时的显式兜底</td></tr>
 <tr><td>打开方式…</td><td>二级环列出所有声明支持该类型的 App（点选）</td></tr>
 <tr><td>快捷编辑</td><td>文本文件进入内联迷你编辑器（⌘S 保存）；非文本 / 文件夹则重命名</td></tr>
@@ -90,15 +90,15 @@
 <div class="section-head"><p class="eyebrow">为桌面而生</p><h2>熟悉的平台，<br>更顺手的操作。</h2><p class="section-lead">从 macOS 开始，把拖拽的习惯延伸到更多桌面。</p></div>
 <div class="card-grid duo">
 <article class="card platform-card"><div class="card-row"><span class="platform-symbol">⌘</span><span class="badge b-ok">原生 macOS</span></div><h3>Mac，先行一步。</h3><p>macOS 13+，集成 Finder、终端与 AirDrop。轮盘停在光标附近，保持熟悉的拖拽节奏。</p><div class="platform-bottom"><span>DMG 已可下载（预发布）</span><a class="text-link" href="#download">下载 ↗</a></div></article>
-<article class="card platform-card"><div class="card-row"><span class="windows-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="badge b-beta">实验性构建版</span></div><h3>Windows，正在路上。</h3><p>面向 Windows 10+ 的 x64 构建版已产出，支持五个常用动作。未经真机验证，运行体验仍待确认。</p><div class="platform-bottom"><span>ZIP 已可下载（预发布）</span><span class="muted">未经真机验证</span></div></article>
+<article class="card platform-card"><div class="card-row"><span class="windows-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="badge b-beta">实验性构建版</span></div><h3>Windows，先尝为快。</h3><p>面向 Windows 10+ 的 x64 构建版已可下载：VSCode 打开、复制路径、新建同格式、资源管理器显示、终端打开五个动作。绿色单文件 exe，双击即用。</p><div class="platform-bottom"><span>ZIP 已可下载（预发布）</span><span class="muted">未经真机验证</span></div></article>
 </div>
 </section>
 <section class="section" id="phone">
-<div class="section-head"><p class="eyebrow">从桌面，到下一台设备</p><h2>分享文件，<br>选择适合你的方式。</h2><p class="section-lead">AirDrop 现在可用。iCloud 与自托管通道仍在完善，状态在这里清楚呈现。</p></div>
+<div class="section-head"><p class="eyebrow">从桌面，到下一台设备</p><h2>分享文件，<br>选择适合你的方式。</h2><p class="section-lead">AirDrop 与自托管中转（本地三端实测）现在可用；iCloud 通道待签名启用。状态在这里清楚呈现。</p></div>
 <div class="card-grid trio">
 <article class="card"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg></span><div class="card-row"><h3>AirDrop</h3><span class="badge b-ok">现已可用</span></div><p>通过系统隔空投送发送到附近设备，支持多选。直接选中轮盘里的 AirDrop 即可开始。</p><span class="card-foot">系统直投 · 近场分享</span></article>
 <article class="card"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M10 18h4"></path></svg></span><div class="card-row"><h3>iCloud 同步</h3><span class="badge b-beta">待验证</span></div><p>设计为经你的 iCloud 私有库同步到手机。CloudKit 链路与 iOS 收件端尚未经真机验证，需 Apple 开发者签名的正式构建。</p><span class="card-foot">iOS 安装包尚未分发</span></article>
-<article class="card"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"></rect><path d="m6 9 3 3-3 3m6 0h5"></path></svg></span><div class="card-row"><h3>自托管中转</h3><span class="badge b-beta">接入中</span></div><p>使用你自己部署的服务器连接设备。本机协议联调已通过，应用内接入与公网部署仍在进行。</p><span class="card-foot">由你管理服务器</span></article>
+<article class="card"><span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"></rect><path d="m6 9 3 3-3 3m6 0h5"></path></svg></span><div class="card-row"><h3>自托管中转</h3><span class="badge b-beta">本地实测通过</span></div><p>使用你自己部署的服务器连接设备。mac 发送、服务端中转、iOS 收件已在本地全链路实测（含邮箱 / 账号码登录）；公网部署与对外分发待进行。</p><span class="card-foot">由你管理服务器</span></article>
 </div>
 </section>
 <section class="section" id="security">
@@ -137,7 +137,7 @@
 </section>
 <section class="section download-section" id="download">
 <div class="download-intro"><p class="eyebrow">下次拖拽，值得期待</p><h2>让文件操作，<em>顺手一点。</em></h2><p class="section-lead">首个公开预发布 v0.1.3 已上线（GitHub Releases）——macOS DMG 与 Windows ZIP 均可下载。</p></div>
-<div class="dl-grid"><a class="btn btn-primary btn-dl" href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener"><span class="dl-name">macOS <span aria-hidden="true">↗</span></span><span class="dl-sub">13+ · v0.1.3 DMG（ad-hoc 签名）</span></a><a class="btn btn-ghost btn-dl" href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener"><span class="dl-name">Windows <span aria-hidden="true">↗</span></span><span class="dl-sub">Win10+ · v0.1.3 ZIP（未真机验证）</span></a></div><p class="download-note">上方链接直达 Releases 下载。macOS 包为 ad-hoc 签名：首次打开请右键→「打开」（或 <code>xattr -d com.apple.quarantine</code> 移除隔离标记）。<br>Windows 构建版未经真机验证 · 代码不开源，授权方案待公布。</p>
+<div class="dl-grid"><a class="btn btn-primary btn-dl" href="https://github.com/kk0x03/kodeoff-release/releases/download/v0.1.3/Kodeoff-0.1.3-macOS.dmg" target="_blank" rel="noopener"><span class="dl-name">macOS <span aria-hidden="true">↗</span></span><span class="dl-sub">13+ · v0.1.3 DMG（ad-hoc 签名）</span></a><a class="btn btn-ghost btn-dl" href="https://github.com/kk0x03/kodeoff-release/releases/download/v0.1.3/Kodeoff-0.1.3-windows-x64-native.zip" target="_blank" rel="noopener"><span class="dl-name">Windows <span aria-hidden="true">↗</span></span><span class="dl-sub">Win10+ · v0.1.3 ZIP（未真机验证）</span></a></div><p class="download-note">上方为 v0.1.3 直链下载。macOS 包为 ad-hoc 签名：首次打开请右键→「打开」（或 <code>xattr -d com.apple.quarantine</code> 移除隔离标记）。<br>Windows 版为绿色单文件 exe（约 360KB），双击即用、无需安装：未配数字签名，首次运行 SmartScreen 请选「仍要运行」；仅含五个基础动作（不含发手机与账号功能），且尚未经真机验证。<br>历史版本、交叉编译版与校验和见 <a href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener">Releases 页</a> · 代码不开源，授权方案待公布。</p>
 </section>
 <section class="section faq-section" id="faq">
 <div class="section-head"><p class="eyebrow">你可能还想知道</p><h2>常见问题。</h2></div>
