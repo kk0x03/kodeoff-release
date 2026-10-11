@@ -7,8 +7,17 @@
     var labels = Array.from(d.querySelectorAll('.radial-label'));
     var status = d.querySelector('.demo-status-text');
     if (!wheel || !status || !labels.length) return;
+    var active = labels.find(function (item) { return item.classList.contains('is-target'); }) || labels[0];
+    var angle = Number(active.dataset.index) * 360 / labels.length;
+    wheel.style.setProperty('--selected-angle', angle + 'deg');
     function select(button) {
-      wheel.style.setProperty('--selected-angle', (Number(button.dataset.index) * 360 / labels.length) + 'deg');
+      if (button === active) return;
+      var target = Number(button.dataset.index) * 360 / labels.length;
+      // Keep the rotation continuous across the last/first sector boundary.
+      var delta = ((target - angle) % 360 + 540) % 360 - 180;
+      angle += delta;
+      active = button;
+      wheel.style.setProperty('--selected-angle', angle + 'deg');
       labels.forEach(function (item) {
         var selected = item === button;
         item.classList.toggle('is-target', selected);
@@ -22,6 +31,20 @@
       });
       button.addEventListener('focus', function () { select(button); });
       button.addEventListener('click', function () { select(button); });
+    });
+  }
+  function initThemePreview() {
+    var window = d.querySelector('.demo-window');
+    var buttons = Array.from(d.querySelectorAll('[data-wheel-theme]'));
+    if (!window) return;
+    buttons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        window.classList.toggle('theme-dark', button.dataset.wheelTheme === 'dark');
+        window.classList.toggle('theme-glass', button.dataset.wheelTheme === 'glass');
+        buttons.forEach(function (item) {
+          item.setAttribute('aria-pressed', String(item === button));
+        });
+      });
     });
   }
   function initNav() {
@@ -71,6 +94,7 @@
   function init() {
     d.documentElement.classList.add('js');
     initRadial();
+    initThemePreview();
     initNav();
     initFaq();
   }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kodeoff：网页登录</title>
+<meta name="description" content="在浏览器中登录 Kodeoff 账号，查看收件箱中的文件与剪贴板文本，可下载、复制、删除与登出。">
+<meta name="theme-color" content="#fbfbfd">
+<meta property="og:title" content="Kodeoff：网页登录">
+<meta property="og:description" content="在浏览器中登录 Kodeoff 账号，查看收件箱中的文件与剪贴板文本，可下载、复制、删除与登出。">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="./assets/style.css">
+<link rel="stylesheet" href="./assets/app-login.css">
+<script src="./assets/service-config.js" defer></script>
+<script src="./assets/app-login.js" defer></script>
+</head>
+<body class="native" id="top">
+<a class="skip" href="#main">跳到主要内容</a>
+<main id="main" class="app-main">
+<p class="back-home"><a href="./index.html">← 返回官网首页</a></p>
+
+<!-- 登录视图：与收件箱视图纯 DOM display 切换，无路由 -->
+<section id="view-login" class="login-wrap" aria-label="登录 Kodeoff">
+<div class="login-card">
+<h1>登录 Kodeoff</h1>
+<p class="muted intro-note">登录后查看设备间收到的文件与剪贴板文本。</p>
+<noscript><p class="note-error">此页面需要启用 JavaScript 才能登录；本页为纯静态页，不加载任何第三方脚本。</p></noscript>
+<p id="login-notice" class="note-error" aria-live="polite" hidden></p>
+<form id="login-form" novalidate>
+<div id="server-settings" hidden><div class="field">
+<label for="relay-base">服务器地址</label>
+<input id="relay-base" type="text" inputmode="url" spellcheck="false" autocomplete="off" placeholder="http://127.0.0.1:8765">
+<p id="relay-warn" class="note-warn" hidden>该地址不是本机回环，HTTPS 页面的浏览器会拦截对它的明文请求；远程 relay 需自行配置 TLS（服务端已有 --tls-cert 内置支持）。</p>
+</div>
+</div>
+<div id="tab-row" class="tab-group" role="tablist" aria-label="登录方式">
+<button type="button" id="tab-email" role="tab" aria-selected="true" aria-controls="panel-email">邮箱密码</button>
+<button type="button" id="tab-code" role="tab" aria-selected="false" aria-controls="panel-code">账号码</button>
+</div>
+<div id="panel-email" role="tabpanel" aria-labelledby="tab-email">
+<div class="field">
+<label for="login-email">邮箱</label>
+<input id="login-email" type="email" autocomplete="username" spellcheck="false">
+</div>
+<div class="field">
+<label for="login-password">密码</label>
+<input id="login-password" type="password" autocomplete="current-password">
+</div>
+</div>
+<div id="panel-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+<div class="field">
+<label for="login-code">账号码</label>
+<input id="login-code" type="text" autocomplete="off" spellcheck="false" placeholder="KOD-XXXXX-XXXXX">
+</div>
+<p class="muted field-hint">账号码可在 Mac 端 Kodeoff 设置的中转账号页查看。</p>
+</div>
+<p id="email-closed-note" class="note-warn" hidden>此服务器未启用邮箱登录</p>
+<button id="login-submit" type="submit" class="btn btn-primary btn-block">登录</button>
+<p class="disclose">登录凭据保存在此浏览器的本地存储中；本页不加载第三方脚本。在公共电脑上请用完退出——退出会立即清除本机登录，并尝试吊销本浏览器的登录凭据。</p>
+</form>
+</div>
+</section>
+
+<!-- 收件箱视图 -->
+<section id="view-inbox" aria-label="收件箱" hidden>
+<div class="inbox-head">
+<h1>收件箱</h1>
+<p id="account-line" class="muted account-line"></p>
+<div class="inbox-actions">
+<button id="btn-refresh" type="button" class="btn btn-secondary">刷新</button>
+<button id="btn-logout" type="button" class="btn btn-secondary">登出</button>
+</div>
+<p class="disclose">凭据保存在此浏览器本地存储；退出会立即清除本机登录，并尝试吊销本浏览器的登录凭据。</p>
+</div>
+<p id="inbox-status" class="status" aria-live="polite"></p>
+<div id="inbox-empty" class="empty-card" hidden>
+<p>收件箱是空的。在 Mac 上通过 Kodeoff 发送文件、或复制文本，内容会出现在这里。</p>
+</div>
+<div id="inbox-list"></div>
+<div class="more-wrap"><button id="btn-more" type="button" class="btn btn-secondary" hidden>显示更多</button></div>
+</section>
+</main>
+<footer><a class="brand" href="./index.html"><img src="./favicon.svg" width="28" height="28" alt="">Kodeoff</a><a href="./index.html">首页</a></footer>
+</body>
+</html>
