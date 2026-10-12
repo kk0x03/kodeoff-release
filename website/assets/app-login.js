@@ -36,6 +36,43 @@
   var BIG_FILE = 64 * 1024 * 1024;         // >64MB 下载前 confirm（见 downloadRow 注释）
   var BATCH = 50;                          // DOM 分批渲染（1000 条上限 ÷ 50 = 20 批封顶）
   var MAX_PAGES = 50;                      // has_more 翻页护栏（limit 默认 200，正常远用不到）
+  var UPLOAD_MAX = 100 * 1024 * 1024;      // 网页上传上限：sha256 需把文件整读进 JS 堆算（内存依据见上传段注释）
+  var SOURCE_VERSION = 'web-1.0.0';        // 上传登记的 source_version（服务端 1..256 字节非空）
+  // 上传登记的扩展名 → UTI 映射（iPhone 收件箱按 uti 分流：图片/视频/其余全落
+  // 「文件」栏）。红线：本表永不包含剪贴板文本 UTI（CLIPBOARD_UTI 常量）——
+  // .txt 钉死 public.plain-text；若把文件误归成 CLIPBOARD_UTI，收件箱会整卡按
+  // 剪贴板文本渲染（buildCard 按 uti 分流），文件打不开。未命中/无扩展名 →
+  // public.data（native 同款回退：DeliveryUploadQueue declared typeIdentifier
+  // ?? 按扩展名 ?? public.data）。值全部取 iOS UTType 注册表可解析串。
+  var UPLOAD_UTI = {
+    jpg: 'public.jpeg', jpeg: 'public.jpeg',
+    png: 'public.png',
+    gif: 'com.compuserve.gif',
+    webp: 'org.webmproject.webp',
+    bmp: 'com.microsoft.bmp',
+    heic: 'public.heic', heif: 'public.heif',
+    tif: 'public.tiff', tiff: 'public.tiff',
+    mp4: 'public.mpeg-4',
+    mov: 'com.apple.quicktime-movie',
+    m4v: 'com.apple.m4v-video',
+    mp3: 'public.mp3',
+    m4a: 'public.mpeg-4-audio',
+    wav: 'com.microsoft.waveform-audio',
+    aif: 'public.aiff-audio', aiff: 'public.aiff-audio',
+    pdf: 'com.adobe.pdf',
+    txt: 'public.plain-text',
+    md: 'net.daringfireball.markdown', markdown: 'net.daringfireball.markdown',
+    json: 'public.json',
+    csv: 'public.comma-separated-values-text',
+    html: 'public.html', htm: 'public.html',
+    zip: 'public.zip-archive',
+    doc: 'com.microsoft.word.doc',
+    docx: 'org.openxmlformats.wordprocessingml.document',
+    xls: 'com.microsoft.excel.xls',
+    xlsx: 'org.openxmlformats.spreadsheetml.sheet',
+    ppt: 'com.microsoft.powerpoint.ppt',
+    pptx: 'org.openxmlformats.presentationml.presentation'
+  };
 
   var MSG = {
     connect: '暂时无法连接，请稍后重试',
@@ -72,7 +109,8 @@
       inboxStatus, emptyCard, inboxList, moreBtn,
       registerBlock, registerForm, regNotice, regStep1, regStep2, regInviteInput,
       regEmailInput, regSendBtn, regSentNote, regPasswordInput, regPassword2Input,
-      regCodeInput, regCreateBtn, regBackBtn;
+      regCodeInput, regCreateBtn, regBackBtn,
+      uploadBtn, uploadInput;
   var session = null;      // 当前会话（null=未登录）
   var sessionRevision = 0;
   var items = [];          // 投递行全量持有于 JS 数组，DOM 分批渲染
@@ -86,6 +124,9 @@
   var regInviteCode = '';  // 发码时冻结的邀请码（建号步原样回传；服务端核销在建号事务）
   var busy = false;        // 登录提交进行中
   var loading = false;     // 收件箱加载进行中
+  var uploadBusy = false;  // 上传进行中（按钮此刻是「取消上传」入口）
+  var uploadXhr = null;    // 上传中的 XHR（登出/被吊销时由 resetInboxState abort）
+  var uploadCancel = null; // 上传中的取消动作（abort+删 pending 登记，见 uploadFile）
 
   // ---- 小工具 ----
   function $(id) { return d.getElementById(id); }
@@ -157,6 +198,28 @@
     return s;
   }
 
+  // 上传登记的 uti：扩展名先归一小写再查表；未命中/无扩展名 → public.data
+  function utiForName(name) {
+    var m = /\.([a-z0-9]+)$/i.exec(String(name || ''));
+    if (!m) return 'public.data';
+    var hit = UPLOAD_UTI[m[1].toLowerCase()];
+    return hit || 'public.data';
+  }
+
+  // 上传登记的 record_name：本地生成 v4 UUID（36 位 hex/连字符，恰为服务端
+  // RECORD_NAME_RE 字符集）。randomUUID 仅安全上下文可用，而上传已硬性要求
+  // 安全上下文（sha256 的 crypto.subtle 同源约束）；getRandomValues 无该限制，
+  // 手拼 8-4-4-4-12 两种环境行为一致。
+  function newRecordName() {
+    var b = new Uint8Array(16);
+    window.crypto.getRandomValues(b);
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    var h = bytesToHex(b);
+    return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16)
+      + '-' + h.slice(16, 20) + '-' + h.slice(20, 32);
+  }
+
   // ---- 视图切换（无路由：纯 DOM display 切换）----
   function showLoginView() { viewLogin.hidden = false; viewInbox.hidden = true; }
   function showInboxView() { viewLogin.hidden = true; viewInbox.hidden = false; }
@@ -192,6 +255,12 @@
     moreBtn.hidden = true;
     emptyCard.hidden = true;
     accountLine.textContent = '';
+    // 上传复位（传一半即登出/被吊销：按钮绝不残留「取消上传」态）。两处调方
+    // （handleRevoked/onLogout）都先递增 sessionRevision 再进这里，abort 触发的
+    // XHR 回调经 revision 守卫一律静默，不会改写任何状态。
+    if (uploadXhr) { try { uploadXhr.abort(); } catch (e) {} }
+    uploadBusy = false;
+    uploadBtn.textContent = '上传文件';
   }
 
   // ---- 统一 fetch 包装：所有带 token 的请求必经此处 ----
@@ -873,6 +942,192 @@
       });
   }
 
+  // ---- 上传（浏览器 → 本账号收件箱；同账号 iPhone「文件」栏可见）----
+  // 与下载镜像的第二条投递链路：① 本地预检（零网络）→ ② file.arrayBuffer()
+  // + crypto.subtle 整读算 SHA-256——服务端 PUT 恒时比对，客户端必须自己算，
+  // 绝不沿用下载侧 subtle 缺失即跳过校验的惯例：那条护栏对下载是宽容，对上传
+  // 等于 422 → ③ POST /v1/deliveries 登记（走 api()：JSON 形态 + 401 全局接管，
+  // 绝不重试——头注红线）→ ④ PUT payload（裸 XHR：api() 会把 body 强转 JSON，
+  // 原始字节流只能直连，形态照 onLogout；send(File) 由浏览器自动带
+  // Content-Length，不触发服务端 411；无总超时——浏览器断连与服务端清 .part
+  // 兜底，行留 pending 可整重传或约 1 小时后自动清扫）。
+  // 上限 100MiB 的内存依据：digest 需要约等于文件大小的 ArrayBuffer 整读进
+  // JS 堆（服务端默认上限 512MiB 整读在旧机型是内存事故面，取紧安全系数≥3，
+  // 与下载侧护栏同数量级）；PUT body 传 File 本体，浏览器流式读盘不占 JS 堆。
+  function uploadFile(file) {
+    if (uploadBusy || !session) return;
+    var owner = session;
+    // ---- ① 本地预检（零网络；>100MiB 不发起任何请求，无磁盘实占无上行）----
+    if (typeof file.size !== 'number' || file.size < 0) { setStatus('无法读取文件大小，请重试', true); return; }
+    if (file.size > UPLOAD_MAX) {
+      setStatus('文件超过网页上传上限（100 MB）。更大的文件请在 Kodeoff App 中发送。', true);
+      return;
+    }
+    if (typeof file.arrayBuffer !== 'function') {
+      setStatus('当前浏览器版本过旧，无法读取文件内容，请更换现代浏览器后重试', true);
+      return;
+    }
+    var name = String(file.name || '');
+    var nameBytes = -1;
+    try { nameBytes = new TextEncoder().encode(name).length; } catch (e) { nameBytes = -1; }
+    if (nameBytes < 0) { setStatus('无法读取文件名，请重命名后重试', true); return; }
+    if (nameBytes > 1024) { setStatus('文件名过长（上限 1024 字节），请重命名后重试', true); return; }
+    var subtle = window.crypto && window.crypto.subtle;
+    if (!subtle || typeof subtle.digest !== 'function') {
+      setStatus('当前页面不是 HTTPS，浏览器未提供加密模块，无法计算文件校验值；请通过 HTTPS 访问本页再上传', true);
+      return;
+    }
+
+    // owner + revision 双捕获（onLogout 同款最严形态）：owner 供 PUT 直连取
+    // base/token，revision 供一切异步回调守卫——会话建立/清除必递增，迟到回调
+    // 一律静默（复位已由 resetInboxState 收口，此处不再改写状态）
+    uploadBusy = true;
+    var revision = sessionRevision;
+    uploadBtn.textContent = '取消上传';
+    var recordName = newRecordName();
+    var cancelled = false;
+
+    function endUpload() {
+      uploadBusy = false;
+      uploadXhr = null;
+      uploadCancel = null;
+      if (revision === sessionRevision) uploadBtn.textContent = '上传文件';
+    }
+
+    // 取消：abort 在传请求 + 尝试 DELETE 已登记的 pending 行（即刻腾出配额；
+    // pending 可删，失败/断网不阻塞——登记约 1 小时后服务端自动清扫）
+    uploadCancel = function () {
+      if (cancelled) return;
+      cancelled = true;
+      if (uploadXhr) { try { uploadXhr.abort(); } catch (e) {} }
+      endUpload();
+      setStatus('已取消上传。', false);
+      api('/v1/deliveries/' + encodeURIComponent(recordName), { method: 'DELETE', auth: true }).then(function (r) {
+        if (revision !== sessionRevision) return;
+        if (r === null) return; // 401 已全局接管
+        if (r.networkError || (!r.response.ok && r.response.status !== 404)) {
+          setStatus('已取消上传。未传完的部分将在约 1 小时后自动释放。', false);
+          return;
+        }
+        loadAccount(); // 删除成功：存储用量/条数即刻回落
+      });
+    };
+
+    // ---- ② 计算 SHA-256（single-pass：哈希阶段无字节进度，不假装进度条）----
+    setStatus(file.size > UPLOAD_MAX / 2
+      ? '正在计算文件校验值…（大文件可能需要十几秒）'
+      : '正在计算文件校验值…', false);
+    file.arrayBuffer().then(function (buf) {
+      if (cancelled || revision !== sessionRevision) return null;
+      return subtle.digest('SHA-256', buf).then(function (dig) {
+        if (cancelled || revision !== sessionRevision) return;
+        startRegister(bytesToHex(new Uint8Array(dig)));
+      });
+    }).catch(function () {
+      if (cancelled || revision !== sessionRevision) return;
+      endUpload();
+      setStatus('无法读取文件内容，请重试', true);
+    });
+
+    // ---- ③ 登记（走 api()：401 由全局分支接管回登录页）----
+    function startRegister(sha) {
+      setStatus('正在登记…', false);
+      api('/v1/deliveries', {
+        method: 'POST',
+        auth: true,
+        body: {
+          record_name: recordName,
+          file_name: name,
+          uti: utiForName(name),
+          file_size: file.size,
+          sha256: sha,
+          source_device: DEVICE_NAME,
+          source_version: SOURCE_VERSION
+        }
+      }).then(function (r) {
+        if (cancelled) return;
+        if (r === null) { endUpload(); return; } // 401 已接管（resetInboxState 已复位）
+        if (r.networkError) { endUpload(); setStatus(MSG.connect, true); return; }
+        if (!r.response.ok) {
+          return readJson(r.response).then(function (j) {
+            if (cancelled || !r.current()) return;
+            endUpload();
+            setStatus(messageFor(j), true); // 413/507/409 等信封 message 透传
+          });
+        }
+        startPut();
+      });
+    }
+
+    // ---- ④ 传字节（裸 XHR，onLogout 直连形态）----
+    function startPut() {
+      if (cancelled || revision !== sessionRevision) return;
+      var xhr = new XMLHttpRequest();
+      uploadXhr = xhr;
+      xhr.open('PUT', owner.base + '/v1/deliveries/' + encodeURIComponent(recordName) + '/payload');
+      xhr.setRequestHeader('Authorization', 'Bearer ' + owner.device_token);
+      xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+      var lastNote = '';
+      xhr.upload.onprogress = function (ev) {
+        if (cancelled || revision !== sessionRevision || !ev || !ev.lengthComputable) return;
+        var note = '正在上传 ' + Math.floor((ev.loaded / ev.total) * 100)
+          + '%（' + fmtBytes(ev.loaded) + ' / ' + fmtBytes(ev.total) + '）…';
+        if (note === lastNote) return;
+        lastNote = note;
+        setStatus(note, false);
+      };
+      xhr.onload = function () {
+        if (cancelled || revision !== sessionRevision) return;
+        uploadXhr = null;
+        if (xhr.status === 401) { endUpload(); handleRevoked(); return; } // POST→PUT 之间凭据被吊销
+        if (xhr.status >= 200 && xhr.status < 300) {
+          endUpload();
+          // 成功文案不承诺秒到：服务端 finalize 会唤醒 App 长轮询（通常秒级），
+          // 但网络时延不可承诺；file_name 只经文本渲染（XSS 红线）
+          setStatus('已上传「' + name + '」。手机 Kodeoff 收件箱「文件」栏即可看到。', false);
+          loadAccount(); // 存储用量/条数同步（刷新按钮双调惯例）
+          loadInbox();   // 新条目上屏（恰逢 loading=true 被互斥跳过时，用户点刷新即见）
+          return;
+        }
+        // 其余状态码：JSON 信封走 messageFor 三层兜底；5xx HTML/空体同面
+        var env = null;
+        try {
+          var ct = xhr.getResponseHeader('Content-Type') || '';
+          if (xhr.responseText && ct.indexOf('application/json') !== -1) {
+            var j = JSON.parse(xhr.responseText);
+            if (j && typeof j === 'object') env = j;
+          }
+        } catch (e) { env = null; }
+        endUpload();
+        setStatus(messageFor(env), true);
+      };
+      xhr.onerror = function () {
+        if (cancelled || revision !== sessionRevision) return;
+        uploadXhr = null;
+        endUpload();
+        setStatus(MSG.connect, true); // 断网/CORS 拦/混合内容；服务端已清 .part（行留 pending）
+      };
+      xhr.onabort = function () {
+        if (revision !== sessionRevision) return; // 会话复位路径：resetInboxState 已收尾，静默
+        uploadXhr = null; // 用户取消路径：UI 已由 uploadCancel 收尾
+      };
+      xhr.send(file); // File 本体：浏览器流式读盘，自动带 Content-Length（不触发 411）
+    }
+  }
+
+  function onUploadButton() {
+    if (!session) return;
+    if (uploadBusy) { if (uploadCancel) uploadCancel(); return; }
+    uploadInput.click(); // 触发文件选择器（无 multiple：多文件多次单发）
+  }
+
+  function onUploadInputChange() {
+    if (!session) return;
+    var file = uploadInput.files && uploadInput.files[0];
+    uploadInput.value = ''; // 复位：同一文件二次选择也能再次触发 change
+    if (file) uploadFile(file);
+  }
+
   // ---- 登出：吊销本浏览器设备 ----
   function onLogout() {
     if (!session) return;
@@ -995,6 +1250,8 @@
     emptyCard = $('inbox-empty');
     inboxList = $('inbox-list');
     moreBtn = $('btn-more');
+    uploadBtn = $('btn-upload');
+    uploadInput = $('upload-input');
     registerBlock = $('register-block');
     registerForm = $('register-form');
     regNotice = $('register-notice');
@@ -1028,6 +1285,8 @@
     refreshBtn.addEventListener('click', function () { if (session) { loadAccount(); loadInbox(); } });
     logoutBtn.addEventListener('click', onLogout);
     moreBtn.addEventListener('click', renderBatch);
+    uploadBtn.addEventListener('click', onUploadButton);
+    uploadInput.addEventListener('change', onUploadInputChange);
 
     // 会话恢复：本地有 session 直接进收件箱（首个请求若 401 会被全局分支送回登录页）
     var raw = lsGet(SESSION_KEY);
