@@ -47,6 +47,10 @@
 <label for="login-password">密码</label>
 <input id="login-password" type="password" autocomplete="current-password">
 </div>
+<!-- 忘记密码入口（W3）：仅 invite+邮箱启用+探针成功出现（app-login.js 与注册
+区块同判据统一切换），open/closed/探针失败一律不出现——门控裁决见 app-login.js
+头注红线与忘记密码段注释。 -->
+<div class="field forgot-row"><button type="button" id="forgot-link" class="linklike" hidden>忘记密码？</button></div>
 </div>
 <div id="panel-code" role="tabpanel" aria-labelledby="tab-code" hidden>
 <div class="field">
@@ -82,7 +86,7 @@
 <div id="register-step2" hidden>
 <p id="reg-sent-note" class="register-sent"></p>
 <div class="field">
-<label for="reg-password">设置密码（至少 8 个字符）</label>
+<label for="reg-password">设置密码（至少 8 字节）</label>
 <input id="reg-password" type="password" autocomplete="new-password">
 </div>
 <div class="field">
@@ -94,7 +98,52 @@
 <input id="reg-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" placeholder="6 位数字">
 </div>
 <button id="reg-create" type="submit" class="btn btn-primary btn-block">创建账号</button>
+<!-- 重发验证码（W5，mac 先例 regCodeCountdown=60）：60s 冷却由 app-login.js 假
+时钟可测的前端倒计时驱动，替代「回 step1 重发」的替代性不便；每请求原样回传
+冻结的 email+invite_code，服务端每请求重验邀请码（门在发信配额前），invite 下
+发起与注册发码同一门前置判据。 -->
+<button id="reg-resend" type="button" class="btn btn-secondary btn-block">重新发送验证码</button>
 <button id="reg-back" type="button" class="btn btn-secondary btn-block">返回登录</button>
+</div>
+</form>
+</section>
+<!-- invite+emailClosed（邮箱未启用的邀请制服务器）形态：注册区块整体隐藏时，
+用说明行替代静默隐藏指路 App（W5）；账号码注册网页表单不补（与「账号码=注册
+响应才可见」的凭据心智冲突，iOS 已有纯账号码兜底，网页不跟）。显隐由
+applyRegistrationVisibility 统一裁决。 -->
+<p id="app-register-note" class="muted register-note" hidden>此服务器需通过 Kodeoff App 注册。</p>
+<!-- 忘记密码区块（W3 补腿；两步：/v1/email/reset/code → /v1/email/reset）：
+入口与注册区块同判据（invite+邮箱启用+探针成功，applyRegistrationVisibility 统一
+切换）。结构照 register-block 先例：纯静态骨架 + hidden 切换，无路由；动态文案
+（邮箱/错误 message）一律 JS textContent 渲染（XSS 纪律，app-login.js 头注），
+本块不含任何服务端可控字符串。 -->
+<section id="forgot-block" class="register-block" aria-label="重置密码" hidden>
+<p class="muted register-note">输入注册邮箱获取验证码，确认后设置新密码；重置成功后该账号的全部设备需用新密码重新登录。</p>
+<p id="forgot-notice" class="note-error" aria-live="polite" hidden></p>
+<form id="forgot-form" novalidate>
+<div id="forgot-step1">
+<div class="field">
+<label for="forgot-email">邮箱</label>
+<input id="forgot-email" type="email" autocomplete="email" spellcheck="false">
+</div>
+<button id="forgot-send" type="submit" class="btn btn-primary btn-block">发送验证码</button>
+</div>
+<div id="forgot-step2" hidden>
+<p id="forgot-sent-note" class="register-sent"></p>
+<div class="field">
+<label for="forgot-password">新密码（至少 8 字节）</label>
+<input id="forgot-password" type="password" autocomplete="new-password">
+</div>
+<div class="field">
+<label for="forgot-password2">确认新密码</label>
+<input id="forgot-password2" type="password" autocomplete="new-password">
+</div>
+<div class="field">
+<label for="forgot-code">邮箱验证码</label>
+<input id="forgot-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" placeholder="6 位数字">
+</div>
+<button id="forgot-create" type="submit" class="btn btn-primary btn-block">重置密码</button>
+<button id="forgot-back" type="button" class="btn btn-secondary btn-block">返回登录</button>
 </div>
 </form>
 </section>
