@@ -16,7 +16,12 @@
  * - 网页注册入口仅在 invite 模式出现：发码步持有效邀请码方可消耗全服发信配额
  *   （服务端把邀请码门放在发信配额之前，配额只被持码人消耗）；open 模式网页仍
  *   不做注册/重发验证码/密码重置——原红线对 open 保留：全服发信桶 30/h 共享，
- *   网页重发不节流会烧全服邮件配额（同址冷却 60s 失败不返还）。
+ *   网页重发不节流会烧全服邮件配额（同址冷却 60s 失败不返还）。invite 模式的
+ *   密码重置（忘记密码）网页放行：一致性判据=「每请求是否有门前置的配额消费」
+ *   ——invite 注册发码每请求重验邀请码（门在发信桶前），reset 服务端三态全放行
+ *   且无任何门前置，native 两端均有入口（安装门槛构成滥用屏障），网页对齐 invite
+ *   形态；open 态三端差异（native 有/网页无）如实记为已知缺口，公开化时随本红线
+ *   一并复审。
  * - cursor 是十进制数字字符串（服务端 str(cursor)），当不透明 token 原样回传，
  *   绝不 parseInt——超过 2^53 的整数在 JS number 里会失真。
  * - since/limit/wait 越界服务端直接 400 不钳制：本页只传 since=<cursor>，
@@ -83,12 +88,22 @@
 
   // 已知信封码 → 固定文案（服务端 message 缺失时的兜底；有 message 则原样透传）。
   // 同是 429 的三张面孔必须区分：login_locked/email_locked=登录锁定，rate_limited=IP 洪峰。
+  // 登录/注册域各码串与 Shared RelayErrorMapping（AccountRelay.swift）及服务端
+  // 信封 message（kodeoff_relay.py）逐字同串——website/check.sh 登录/注册域
+  // 16 对显式配对表钉死（一码多 message 只钉主面，非主面网页透传原文如实
+  // 留档），改文案必须三端同步。
   var KNOWN = {
-    login_invalid: '账号码或邮箱密码不正确',
+    login_invalid: '账号码不正确',
     email_login_invalid: '邮箱或密码不正确',
     login_locked: '登录尝试过多，请稍后再试',
     email_locked: '登录尝试过多，请稍后再试',
     rate_limited: '操作过于频繁，请稍后再试',
+    verify_invalid: '验证码不正确',
+    verify_expired: '验证码已过期或已被新码作废，请重新获取',
+    verify_attempts_exhausted: '验证码尝试次数过多，请重新获取',
+    email_taken: '该邮箱已被注册',
+    email_send_failed: '验证码发送失败，请稍后再试',
+    email_bind_invalid: '账号码不正确',
     email_unavailable: '此服务器未启用邮箱登录',
     unknown_record: '该记录不存在或已被删除',
     unknown_device: '该设备不存在或已被吊销',
@@ -109,7 +124,11 @@
       inboxStatus, emptyCard, inboxList, moreBtn,
       registerBlock, registerForm, regNotice, regStep1, regStep2, regInviteInput,
       regEmailInput, regSendBtn, regSentNote, regPasswordInput, regPassword2Input,
-      regCodeInput, regCreateBtn, regBackBtn,
+      regCodeInput, regCreateBtn, regBackBtn, regResendBtn,
+      forgotLink, appRegisterNote, forgotBlock, forgotForm, forgotNotice,
+      forgotStep1, forgotStep2, forgotEmailInput, forgotSendBtn, forgotSentNote,
+      forgotPasswordInput, forgotPassword2Input, forgotCodeInput,
+      forgotCreateBtn, forgotBackBtn,
       uploadBtn, uploadInput;
   var session = null;      // 当前会话（null=未登录）
   var sessionRevision = 0;
@@ -122,6 +141,11 @@
   var regCodeSent = false; // 注册两步态：true=验证码已发（展示密码/验证码步）
   var regEmail = '';       // 发码时冻结的邮箱（建号步原样回传，防两步间被改）
   var regInviteCode = '';  // 发码时冻结的邀请码（建号步原样回传；服务端核销在建号事务）
+  var regResendLeft = 0;   // 重发码冷却剩余秒数（0=可点；对齐服务端默认同址 60s）
+  var regResendTimer = null;
+  var forgotBusy = false;  // 忘记密码请求进行中（发码/改密共用一把）
+  var forgotCodeSent = false; // 忘记密码两步态
+  var forgotEmail = '';    // 发码时冻结的邮箱（改密步原样回传）
   var busy = false;        // 登录提交进行中
   var loading = false;     // 收件箱加载进行中
   var uploadBusy = false;  // 上传进行中（按钮此刻是「取消上传」入口）
@@ -206,6 +230,54 @@
     return hit || 'public.data';
   }
 
+  // ---- 预检口径（对齐 native/服务端同一把尺，消「服务器返回错误：」技术前缀面）----
+
+  // UTF-8 字节数：TextEncoder 优先（上传段同款先例）；缺席的旧环境按码点手工
+  // 折算兜底（代理对两个码元记一个码点）。口径与服务端 valid_password 一致
+  // （8-128 字节）——按 JS length（UTF-16 码元数）会让 3 个中文（9 字节）误拒、
+  // 129 个 ASCII 误放。
+  function utf8Length(s) {
+    if (typeof TextEncoder === 'function') {
+      try { return new TextEncoder().encode(s).length; } catch (e) { /* 落手工计数 */ }
+    }
+    var n = 0;
+    for (var i = 0; i < s.length; i++) {
+      var c = s.codePointAt(i);
+      if (c > 0xffff) i++;
+      n += c < 0x80 ? 1 : (c < 0x800 ? 2 : (c < 0x10000 ? 3 : 4));
+    }
+    return n;
+  }
+
+  // 邮箱形状预检：EmailFormValidation.isValidEmail（AccountRelay.swift:484）的
+  // JS 等价复刻，与服务端 normalize_email 同形状——trim+小写+剥**单个**尾点后：
+  // 恰一个 @；local 1..64 字节且仅限常见 ASCII 符号集（a-z0-9._%+-）；域名 ≥2 个
+  // 标签、每标签 1..63 字节、字母数字构成且连字符不在首尾；整串 ≤254 字节。
+  // 刻意 ASCII 化（非 ASCII 局部/标签一律 false）：预检与入库同尺，过了预检服务
+  // 端就不会再拒形状——不合规邮箱本地拦，不再吃一个 400 round trip 的技术文案。
+  // 登录/注册发码/忘记密码三处共用本函数。
+  function isValidEmail(raw) {
+    var email = String(raw == null ? '' : raw).replace(/^\s+|\s+$/g, '').toLowerCase();
+    if (email.charAt(email.length - 1) === '.') email = email.slice(0, -1); // 容忍单个尾点
+    var at = email.indexOf('@');
+    if (at < 1 || at !== email.lastIndexOf('@')) return false; // local 空/双 @ 同拦
+    var local = email.slice(0, at);
+    var domain = email.slice(at + 1);
+    if (!local || !domain) return false;
+    if (utf8Length(local) > 64 || utf8Length(email) > 254) return false;
+    if (!/^[a-z0-9._%+-]+$/.test(local)) return false;
+    var labels = domain.split('.');
+    if (labels.length < 2) return false;
+    for (var i = 0; i < labels.length; i++) {
+      var label = labels[i];
+      var bytes = utf8Length(label);
+      if (bytes < 1 || bytes > 63) return false;
+      if (!/^[a-z0-9-]+$/.test(label)) return false;
+      if (label.charAt(0) === '-' || label.charAt(label.length - 1) === '-') return false;
+    }
+    return true;
+  }
+
   // 上传登记的 record_name：本地生成 v4 UUID（36 位 hex/连字符，恰为服务端
   // RECORD_NAME_RE 字符集）。randomUUID 仅安全上下文可用，而上传已硬性要求
   // 安全上下文（sha256 的 crypto.subtle 同源约束）；getRandomValues 无该限制，
@@ -242,6 +314,10 @@
     sessionRevision += 1;
     lsRemove(SESSION_KEY);
     resetInboxState();
+    // 注册/忘记密码态一并弃置（触发时必已登录、两区块不可见，无输入丢失风险）：
+    // 公共电脑上吊销回登录页不残留密码/验证码（隐私同 resetInboxState 收口理由）
+    resetRegistration();
+    resetForgot();
     showLoginView();
     showLoginNotice(MSG.revoked);
   }
@@ -371,7 +447,7 @@
     var code = codeInput.value.trim();
     if (useEmail) {
       if (!email) { showLoginNotice('请输入邮箱'); return; }
-      if (email.indexOf('@') < 1) { showLoginNotice('请输入有效的邮箱地址'); return; }
+      if (!isValidEmail(email)) { showLoginNotice('请输入有效的邮箱地址'); return; } // W4：与服务端同尺的形状预检
       if (!password) { showLoginNotice('请输入密码'); return; }
     } else if (!code) {
       showLoginNotice('请输入账号码');
@@ -454,7 +530,17 @@
   function applyRegistrationVisibility() {
     var show = regMode === 'invite' && !emailClosed;
     registerBlock.hidden = !show;
-    if (!show) resetRegistration(); // 隐藏即弃置：邀请码/密码不残留 DOM
+    // 忘记密码入口与注册区块同判据（invite+邮箱启用+探针成功；open/closed/
+    // unknown 一律不出现——不猜，门控裁决见头注红线与忘记密码段注释）
+    forgotLink.hidden = !show;
+    // invite+emailClosed（邮箱未启用的邀请制服务器）：注册区块整体隐藏，改为
+    // 在登录区渲染说明行指路 App（W5；账号码注册网页表单不补——与「账号码=
+    // 注册响应才可见」的凭据心智冲突，iOS 已有纯账号码兜底，网页不跟）
+    appRegisterNote.hidden = !(regMode === 'invite' && emailClosed);
+    if (!show) {
+      resetForgot(); // 隐藏即弃置：忘记密码两步态不残留
+      resetRegistration(); // 隐藏即弃置：邀请码/密码不残留 DOM
+    }
   }
 
   function resetRegistration() {
@@ -476,6 +562,7 @@
     regSentNote.textContent = '';
     regNotice.textContent = '';
     regNotice.hidden = true;
+    stopRegCooldown();
   }
 
   function showRegNotice(msg) { regNotice.textContent = msg; regNotice.hidden = false; }
@@ -492,11 +579,62 @@
     if (regCodeSent) onRegCreate(); else onRegSend();
   }
 
-  // 第 1 步：POST /v1/email/register/code {email, invite_code} → 202。邀请码门在
-  // 服务端发信配额消费之前：无码/错码连发信桶都烧不到，网页发起才安全（头注红线
-  // 的收窄依据）。202 是反枚举面：邮箱已被注册时服务端发中性通知而非验证码，响应
-  // 零差异——已发送提示如实措辞不区分。email/invite_code 两步间冻结，建号步原样
-  // 回传（发码步只校验不消费，核销在 /v1/email/register 建号事务内）。
+  // 注册忙态统一复位（W2）：regBusy 互斥保证调用时不存在并发注册请求（新请求
+  // 被拦到复位为止），迟到响应再复位是幂等安全；只解忙与按钮复位——setRegStep/
+  // 冻结值/提示留守卫内，保护语义零删减（纯提复位）。
+  function regReleaseBusy() {
+    regBusy = false;
+    regSendBtn.disabled = false;
+    regSendBtn.textContent = '发送验证码';
+    regCreateBtn.disabled = false;
+    regCreateBtn.textContent = '创建账号';
+    updateRegResendBtn();
+  }
+
+  // 重发冷却（W5，mac 先例 RelayAccountSection regCodeCountdown=60）：前端 60s
+  // 对齐默认部署的同址冷却（email_code_cooldown=RateLimiter(1,60)）；自定义
+  // limits.email_code_cooldown_seconds 的实例上前端冷却短于服务端时 61s 后点击
+  // 仍可能 429——由 KNOWN.rate_limited 透传兜底（无技术前缀），如实留档。
+  // setTimeout 链（不用 setInterval）：单一原语，测试假时钟好对账。
+  var RESEND_COOLDOWN_SECONDS = 60;
+  function updateRegResendBtn() {
+    if (regResendLeft > 0) {
+      regResendBtn.disabled = true;
+      regResendBtn.textContent = '重新发送（' + regResendLeft + 's）';
+    } else {
+      regResendBtn.disabled = false;
+      regResendBtn.textContent = '重新发送验证码';
+    }
+  }
+
+  function stopRegCooldown() {
+    if (regResendTimer !== null) { clearTimeout(regResendTimer); regResendTimer = null; }
+    regResendLeft = 0;
+    updateRegResendBtn();
+  }
+
+  function beginRegCooldown() {
+    stopRegCooldown();
+    regResendLeft = RESEND_COOLDOWN_SECONDS;
+    updateRegResendBtn();
+    var tickDown = function () {
+      regResendLeft -= 1;
+      if (regResendLeft <= 0) {
+        regResendLeft = 0;
+        regResendTimer = null;
+      } else {
+        regResendTimer = setTimeout(tickDown, 1000);
+      }
+      updateRegResendBtn();
+    };
+    regResendTimer = setTimeout(tickDown, 1000);
+  }
+
+  // 第 1 步入口：POST /v1/email/register/code {email, invite_code} → 202。邀请码
+  // 门在服务端发信配额消费之前：无码/错码连发信桶都烧不到，网页发起才安全（头注
+  // 红线的收窄依据）。202 是反枚举面：邮箱已被注册时服务端发中性通知而非验证码，
+  // 响应零差异——已发送提示如实措辞不区分。邮箱形状先本地预检（isValidEmail 与
+  // 服务端同尺，消 400 技术文案直出）。
   function onRegSend() {
     if (regBusy) return;
     hideRegNotice();
@@ -506,18 +644,23 @@
     var email = regEmailInput.value.trim();
     if (!invite) { showRegNotice('请输入邀请码'); return; }
     if (!email) { showRegNotice('请输入邮箱'); return; }
-    if (email.indexOf('@') < 1) { showRegNotice('请输入有效的邮箱地址'); return; }
+    if (!isValidEmail(email)) { showRegNotice('请输入有效的邮箱地址'); return; }
+    sendRegCode(n, invite, email);
+  }
 
+  // 发码核心（onRegSend 首发与 onRegResend 重发共用）：email/invite_code 两步间
+  // 冻结，建号步原样回传（发码步只校验不消费，核销在 /v1/email/register 建号
+  // 事务内）。成功一律回 step2 并重启 60s 冷却。
+  function sendRegCode(n, invite, email) {
     regBusy = true;
-    var revision = sessionRevision;
     regSendBtn.disabled = true;
     regSendBtn.textContent = '发送中…';
+    regResendBtn.disabled = true;
+    var revision = sessionRevision;
 
     function done(msg) {
+      regReleaseBusy(); // 复位在 revision 守卫外（W2：迟到响应必解忙）
       if (revision !== sessionRevision) return;
-      regBusy = false;
-      regSendBtn.disabled = false;
-      regSendBtn.textContent = '发送验证码';
       if (msg) showRegNotice(msg);
     }
 
@@ -528,29 +671,44 @@
     }).then(function (res) {
       return readJson(res).then(function (j) { return { res: res, j: j }; });
     }).then(function (step) {
-      if (!step || revision !== sessionRevision) return;
+      if (!step || revision !== sessionRevision) { regReleaseBusy(); return; }
       if (step.res.ok) {
         regEmail = email;
         regInviteCode = invite;
         setRegStep(true);
-        regBusy = false;
-        regSendBtn.disabled = false;
-        regSendBtn.textContent = '发送验证码';
+        regReleaseBusy();
         // 服务端可控字符串（邮箱）经 textContent 渲染，无 HTML 解析（XSS 红线）
         regSentNote.textContent = '若该邮箱可用于注册，验证码已发送至 ' + email
           + '（10 分钟内有效）；没收到请检查垃圾邮件。';
+        beginRegCooldown();
         return;
       }
-      done(messageFor(step.j)); // 四门控码经 KNOWN 表冻结文案兜底
+      done(messageFor(step.j)); // 四门控码/漂移族经 KNOWN 表冻结文案兜底
     }).catch(function () {
       done(MSG.connect);
     });
   }
 
+  // step2 重发（W5）：原样回传冻结的 email+invite_code，服务端每请求重验邀请码
+  //（门在发信配额前）——与注册发码同一门前置判据，与 open 态无门前置本质不同。
+  function onRegResend() {
+    if (regBusy || regResendLeft > 0) return;
+    var n = normalizeBase(relayInput.value || DEFAULT_BASE);
+    if (!n) { showRegNotice('服务器地址需以 http:// 或 https:// 开头'); return; }
+    if (!regEmail || !regInviteCode) {
+      setRegStep(false);
+      stopRegCooldown();
+      showRegNotice('请先发送验证码');
+      return;
+    }
+    hideRegNotice();
+    sendRegCode(n, regInviteCode, regEmail);
+  }
+
   // 第 2 步：POST /v1/email/register {email, password, code, device_name,
   // invite_code} → 201 三件套入 session（复用 onLoginSubmit 的收尾形态）。
-  // 密码一致性/验证码形态先本地预检：服务端表单校验在邮箱验证码消费之前，
-  // 不烧码，但少打一次无谓请求总是对的。device_name 用 DEVICE_NAME。
+  // 密码一致性/字节口径/验证码形态先本地预检：服务端表单校验在邮箱验证码消费
+  // 之前，不烧码，但少打一次无谓请求总是对的。device_name 用 DEVICE_NAME。
   function onRegCreate() {
     if (regBusy) return;
     hideRegNotice();
@@ -562,19 +720,21 @@
     var vcode = regCodeInput.value.trim();
     if (!password || !password2) { showRegNotice('请输入密码'); return; }
     if (password !== password2) { showRegNotice('两次输入的密码不一致'); return; }
-    if (password.length < 8) { showRegNotice('密码至少 8 个字符'); return; }
+    // 密码长度按 UTF-8 字节 8-128 双向（W4，与服务端 valid_password/native
+    // EmailFormValidation 同一把尺；改前只查字符数下限，超 128 字节会在建号步
+    // 吃 400 并显示带「服务器返回错误：」前缀的技术文案）
+    var pwBytes = utf8Length(password);
+    if (pwBytes < 8 || pwBytes > 128) { showRegNotice('密码需 8-128 字节（UTF-8，至少 8 个字符）'); return; }
     if (!/^[0-9]{6}$/.test(vcode)) { showRegNotice('请输入 6 位数字验证码'); return; }
 
     regBusy = true;
-    var revision = sessionRevision;
     regCreateBtn.disabled = true;
     regCreateBtn.textContent = '创建中…';
+    var revision = sessionRevision;
 
     function done(msg) {
+      regReleaseBusy(); // 复位在 revision 守卫外（W2：迟到响应必解忙）
       if (revision !== sessionRevision) return;
-      regBusy = false;
-      regCreateBtn.disabled = false;
-      regCreateBtn.textContent = '创建账号';
       if (msg) showRegNotice(msg);
     }
 
@@ -591,7 +751,7 @@
     }).then(function (res) {
       return readJson(res).then(function (j) { return { res: res, j: j }; });
     }).then(function (step) {
-      if (!step || revision !== sessionRevision) return;
+      if (!step || revision !== sessionRevision) { regReleaseBusy(); return; }
       if (step.res.ok && step.j && typeof step.j.device_token === 'string' && step.j.device_token) {
         // 201 三件套入 session（形态同 onLoginSubmit 收尾：localStorage 单键、
         // XSS 缓解同源）；随后弃置注册态——邀请码已核销，输入框即刻清空
@@ -604,6 +764,7 @@
         sessionRevision += 1;
         lsSet(SESSION_KEY, JSON.stringify(session));
         lsSet(RELAY_KEY, n.base); // 非敏感偏好：下次免输
+        stopRegCooldown();
         resetRegistration();
         hideLoginNotice();
         showInboxView();
@@ -619,8 +780,9 @@
 
   function onRegBack() {
     // 返回登录：弃置密码/验证码（已发验证码作废不返还——服务端 TTL 收口），
-    // 邀请码/邮箱保留供修正重发；焦点交回登录邮箱框
+    // 邀请码/邮箱保留供修正重发；冷却一并停表（重进重来）；焦点交回登录邮箱框
     setRegStep(false);
+    stopRegCooldown();
     regPasswordInput.value = '';
     regPassword2Input.value = '';
     regCodeInput.value = '';
@@ -628,6 +790,169 @@
     hideRegNotice();
     emailInput.focus();
   }
+
+  // ---- 忘记密码（W3 补腿；仅 invite+邮箱启用+探针成功出现，入口与注册区块同
+  // 判据由 applyRegistrationVisibility 统一切换）----
+  // 两步流：POST /v1/email/reset/code {email} → 202；POST /v1/email/reset
+  // {email, password, code} → 204（吊销该账号全部设备 token——账号码通道不受
+  // 影响）。服务端零改动（reset 无邀请码门、三态全放行）。202 对不存在邮箱发
+  // 中性通知，零差异——提示如实措辞不区分。成功收尾照 mac resetSheetDismissed
+  // 先例：回登录面并预填邮箱（RelayAccountSection.swift resetSheetDismissed）。
+  // 门控裁决见头注红线：invite 放行（无门前置配额消费），open 不出现（差异
+  // 如实留档），closed/unknown/探针失败不猜不出现。
+  function onForgotClick() {
+    if (forgotBusy) return;
+    resetForgot(); // 每次进入都是干净两步（幂等）
+    forgotBlock.hidden = false;
+  }
+
+  function onForgotSubmit(ev) {
+    ev.preventDefault();
+    if (forgotCodeSent) onForgotCreate(); else onForgotSend();
+  }
+
+  function onForgotSend() {
+    if (forgotBusy) return;
+    hideForgotNotice();
+    var n = normalizeBase(relayInput.value || DEFAULT_BASE);
+    if (!n) { showForgotNotice('服务器地址需以 http:// 或 https:// 开头'); return; }
+    var email = forgotEmailInput.value.trim();
+    if (!email) { showForgotNotice('请输入邮箱'); return; }
+    if (!isValidEmail(email)) { showForgotNotice('请输入有效的邮箱地址'); return; }
+
+    forgotBusy = true;
+    forgotSendBtn.disabled = true;
+    forgotSendBtn.textContent = '发送中…';
+    var revision = sessionRevision;
+
+    function release() {
+      forgotBusy = false;
+      forgotSendBtn.disabled = false;
+      forgotSendBtn.textContent = '发送验证码';
+    }
+    function done(msg) {
+      release(); // 复位在 revision 守卫外（W2 统一形态）
+      if (revision !== sessionRevision) return;
+      if (msg) showForgotNotice(msg);
+    }
+
+    fetch(n.base + '/v1/email/reset/code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    }).then(function (res) {
+      return readJson(res).then(function (j) { return { res: res, j: j }; });
+    }).then(function (step) {
+      if (!step || revision !== sessionRevision) { release(); return; }
+      if (step.res.ok) {
+        forgotEmail = email;
+        forgotCodeSent = true;
+        release();
+        forgotStep1.hidden = true;
+        forgotStep2.hidden = false;
+        // 服务端可控字符串（邮箱）经 textContent 渲染（XSS 红线）
+        forgotSentNote.textContent = '若该邮箱已注册，验证码已发送至 ' + email
+          + '（10 分钟内有效）；没收到请检查垃圾邮件。';
+        return;
+      }
+      done(messageFor(step.j)); // verify_*/rate_limited/email_send_failed 经 KNOWN 表
+    }).catch(function () {
+      done(MSG.connect);
+    });
+  }
+
+  function onForgotCreate() {
+    if (forgotBusy) return;
+    hideForgotNotice();
+    var n = normalizeBase(relayInput.value || DEFAULT_BASE);
+    if (!n) { showForgotNotice('服务器地址需以 http:// 或 https:// 开头'); return; }
+    if (!forgotEmail) { setForgotStep(false); showForgotNotice('请先发送验证码'); return; }
+    var password = forgotPasswordInput.value;
+    var password2 = forgotPassword2Input.value;
+    var vcode = forgotCodeInput.value.trim();
+    if (!password || !password2) { showForgotNotice('请输入新密码'); return; }
+    if (password !== password2) { showForgotNotice('两次输入的密码不一致'); return; }
+    var pwBytes = utf8Length(password); // 与注册同尺：UTF-8 字节 8-128 双向（W4）
+    if (pwBytes < 8 || pwBytes > 128) { showForgotNotice('密码需 8-128 字节（UTF-8，至少 8 个字符）'); return; }
+    if (!/^[0-9]{6}$/.test(vcode)) { showForgotNotice('请输入 6 位数字验证码'); return; }
+
+    forgotBusy = true;
+    forgotCreateBtn.disabled = true;
+    forgotCreateBtn.textContent = '重置中…';
+    var revision = sessionRevision;
+
+    function release() {
+      forgotBusy = false;
+      forgotCreateBtn.disabled = false;
+      forgotCreateBtn.textContent = '重置密码';
+    }
+    function done(msg) {
+      release();
+      if (revision !== sessionRevision) return;
+      if (msg) showForgotNotice(msg);
+    }
+
+    fetch(n.base + '/v1/email/reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: forgotEmail, password: password, code: vcode })
+    }).then(function (res) {
+      return readJson(res).then(function (j) { return { res: res, j: j }; });
+    }).then(function (step) {
+      if (!step || revision !== sessionRevision) { release(); return; }
+      if (step.res.ok) { // 204 无体
+        var finished = forgotEmail;
+        resetForgot(); // 全复位（含输入框与步骤态）
+        emailInput.value = finished; // 预填邮箱，引导回邮箱登录（mac 先例）
+        showLoginNotice('密码已重置，该账号的全部设备已登出。请用新密码重新登录。');
+        return;
+      }
+      done(messageFor(step.j)); // 错码/过期/频控同面
+    }).catch(function () {
+      done(MSG.connect);
+    });
+  }
+
+  function onForgotBack() {
+    // 收起重置区块回登录面：弃置密码/验证码，邮箱保留供返回后直接重试
+    setForgotStep(false);
+    forgotPasswordInput.value = '';
+    forgotPassword2Input.value = '';
+    forgotCodeInput.value = '';
+    forgotSentNote.textContent = '';
+    hideForgotNotice();
+    forgotBlock.hidden = true;
+    emailInput.focus();
+  }
+
+  function setForgotStep(codeSent) {
+    forgotCodeSent = codeSent;
+    forgotStep1.hidden = codeSent;
+    forgotStep2.hidden = !codeSent;
+  }
+
+  function resetForgot() {
+    forgotBusy = false;
+    forgotCodeSent = false;
+    forgotEmail = '';
+    forgotEmailInput.value = '';
+    forgotPasswordInput.value = '';
+    forgotPassword2Input.value = '';
+    forgotCodeInput.value = '';
+    forgotSendBtn.disabled = false;
+    forgotSendBtn.textContent = '发送验证码';
+    forgotCreateBtn.disabled = false;
+    forgotCreateBtn.textContent = '重置密码';
+    forgotStep1.hidden = false;
+    forgotStep2.hidden = true;
+    forgotSentNote.textContent = '';
+    forgotNotice.textContent = '';
+    forgotNotice.hidden = true;
+    forgotBlock.hidden = true;
+  }
+
+  function showForgotNotice(msg) { forgotNotice.textContent = msg; forgotNotice.hidden = false; }
+  function hideForgotNotice() { forgotNotice.textContent = ''; forgotNotice.hidden = true; }
 
   // ---- 收件箱 ----
   function loadAccount() {
@@ -1138,6 +1463,10 @@
     var revision = sessionRevision;
     lsRemove(SESSION_KEY);
     resetInboxState();
+    // 注册/忘记密码态一并弃置（改前只清登录表单，登出后区块残留 step2 密码/
+    // 验证码输入值与旧提示——公共电脑隐私面；resetRegistration 清 5 个输入）
+    resetRegistration();
+    resetForgot();
     passwordInput.value = '';
     codeInput.value = '';
     showLoginView();
@@ -1266,6 +1595,22 @@
     regCodeInput = $('reg-code');
     regCreateBtn = $('reg-create');
     regBackBtn = $('reg-back');
+    regResendBtn = $('reg-resend');
+    forgotLink = $('forgot-link');
+    appRegisterNote = $('app-register-note');
+    forgotBlock = $('forgot-block');
+    forgotForm = $('forgot-form');
+    forgotNotice = $('forgot-notice');
+    forgotStep1 = $('forgot-step1');
+    forgotStep2 = $('forgot-step2');
+    forgotEmailInput = $('forgot-email');
+    forgotSendBtn = $('forgot-send');
+    forgotSentNote = $('forgot-sent-note');
+    forgotPasswordInput = $('forgot-password');
+    forgotPassword2Input = $('forgot-password2');
+    forgotCodeInput = $('forgot-code');
+    forgotCreateBtn = $('forgot-create');
+    forgotBackBtn = $('forgot-back');
 
     var saved = lsGet(RELAY_KEY);
     relayInput.value = saved || DEFAULT_BASE;
@@ -1282,6 +1627,10 @@
     loginForm.addEventListener('submit', onLoginSubmit);
     registerForm.addEventListener('submit', onRegisterSubmit); // 发送验证码/创建账号都是 submit，Enter 同路
     regBackBtn.addEventListener('click', onRegBack);
+    regResendBtn.addEventListener('click', onRegResend); // step2 重发（60s 冷却，W5）
+    forgotLink.addEventListener('click', onForgotClick); // 忘记密码入口（W3，invite 限定）
+    forgotForm.addEventListener('submit', onForgotSubmit); // 发码/重置都是 submit，Enter 同路
+    forgotBackBtn.addEventListener('click', onForgotBack);
     refreshBtn.addEventListener('click', function () { if (session) { loadAccount(); loadInbox(); } });
     logoutBtn.addEventListener('click', onLogout);
     moreBtn.addEventListener('click', renderBatch);
