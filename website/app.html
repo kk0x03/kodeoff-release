@@ -108,7 +108,13 @@
 <p id="account-line" class="muted account-line"></p>
 <div class="inbox-actions">
 <button id="btn-refresh" type="button" class="btn btn-secondary">刷新</button>
+<button id="btn-upload" type="button" class="btn btn-secondary">上传文件</button>
 <button id="btn-logout" type="button" class="btn btn-secondary">登出</button>
+<!-- 上传区块（发送能力收编收件箱，与刷新/登出同级）：按钮只触发下方隐藏的
+file input，进度/结果文案全走 #inbox-status（textContent 渲染），本块零服务端
+可控字符串。input 不带 btn 类，平时由 [hidden] 钉死规则（app-login.css 首段）
+保持不可见；上传流程、上限与错误矩阵见 app-login.js 上传段注释。 -->
+<input id="upload-input" type="file" hidden>
 </div>
 <p class="disclose">凭据保存在此浏览器本地存储；退出会立即清除本机登录，并尝试吊销本浏览器的登录凭据。</p>
 </div>
