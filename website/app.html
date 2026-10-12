@@ -59,6 +59,45 @@
 <button id="login-submit" type="submit" class="btn btn-primary btn-block">登录</button>
 <p class="disclose">登录凭据保存在此浏览器的本地存储中；本页不加载第三方脚本。在公共电脑上请用完退出——退出会立即清除本机登录，并尝试吊销本浏览器的登录凭据。</p>
 </form>
+<!-- 注册区块（内测邀请制）：仅 registration_mode=invite 时由 app-login.js 能力探测
+显示；open 模式网页无注册入口（红线见 app-login.js 头注），closed/探针失败同隐藏。
+结构照 panel-email/tab-row/email-closed-note 先例：纯静态骨架 + hidden 切换，无路由；
+动态文案一律 JS textContent 渲染（XSS 纪律，app-login.js 头注），本块不含任何服务端
+可控字符串。 -->
+<section id="register-block" class="register-block" aria-label="注册新账号" hidden>
+<p class="muted register-note">此服务器采用邀请制注册：输入邀请码与邮箱，验证后创建账号。</p>
+<p id="register-notice" class="note-error" aria-live="polite" hidden></p>
+<form id="register-form" novalidate>
+<div id="register-step1">
+<div class="field">
+<label for="reg-invite">邀请码</label>
+<input id="reg-invite" type="text" autocomplete="off" spellcheck="false" placeholder="INV-XXXXXXXX-XXXXXXXX">
+</div>
+<div class="field">
+<label for="reg-email">邮箱</label>
+<input id="reg-email" type="email" autocomplete="email" spellcheck="false">
+</div>
+<button id="reg-send" type="submit" class="btn btn-primary btn-block">发送验证码</button>
+</div>
+<div id="register-step2" hidden>
+<p id="reg-sent-note" class="register-sent"></p>
+<div class="field">
+<label for="reg-password">设置密码（至少 8 个字符）</label>
+<input id="reg-password" type="password" autocomplete="new-password">
+</div>
+<div class="field">
+<label for="reg-password2">确认密码</label>
+<input id="reg-password2" type="password" autocomplete="new-password">
+</div>
+<div class="field">
+<label for="reg-code">邮箱验证码</label>
+<input id="reg-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" placeholder="6 位数字">
+</div>
+<button id="reg-create" type="submit" class="btn btn-primary btn-block">创建账号</button>
+<button id="reg-back" type="button" class="btn btn-secondary btn-block">返回登录</button>
+</div>
+</form>
+</section>
 </div>
 </section>
 
