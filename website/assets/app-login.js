@@ -1,5 +1,6 @@
-/* Kodeoff 网页客户端：登录（邮箱/账号码三态自适应）+ 收件箱（文件下载、剪贴板
- * 文本查看/复制/删除）+ 登出（吊销本浏览器设备）。
+/* Kodeoff 网页客户端：登录（邮箱/账号码三态自适应）+ 注册（invite 邀请制，仅
+ * invite 模式出现）+ 收件箱（文件下载、剪贴板文本查看/复制/删除）+ 登出（吊销
+ * 本浏览器设备）。
  *
  * 纪律（红线，逐条有理由）：
  * - 零依赖纯静态：无框架无构建，浏览器直连用户自部署 relay（HTTPS 页 →
@@ -12,8 +13,10 @@
  *   属性赋值非 HTML 解析，安全。URL 拼接一律 encodeURIComponent(record_name)。
  * - 4xx 一律不自动重试：服务端 login_guard 是全服持久熔断（20 次失败/600s），
  *   自动重试会烧全服登录名额殃及 native 端；401 分支只清凭据回登录页，不重试。
- * - 网页不做注册/重发验证码/密码重置：全服发信桶 30/h 共享，网页重发不节流
- *   会烧全服邮件配额（同址冷却 60s 失败不返还）。
+ * - 网页注册入口仅在 invite 模式出现：发码步持有效邀请码方可消耗全服发信配额
+ *   （服务端把邀请码门放在发信配额之前，配额只被持码人消耗）；open 模式网页仍
+ *   不做注册/重发验证码/密码重置——原红线对 open 保留：全服发信桶 30/h 共享，
+ *   网页重发不节流会烧全服邮件配额（同址冷却 60s 失败不返还）。
  * - cursor 是十进制数字字符串（服务端 str(cursor)），当不透明 token 原样回传，
  *   绝不 parseInt——超过 2^53 的整数在 JS number 里会失真。
  * - since/limit/wait 越界服务端直接 400 不钳制：本页只传 since=<cursor>，
@@ -51,7 +54,14 @@
     rate_limited: '操作过于频繁，请稍后再试',
     email_unavailable: '此服务器未启用邮箱登录',
     unknown_record: '该记录不存在或已被删除',
-    unknown_device: '该设备不存在或已被吊销'
+    unknown_device: '该设备不存在或已被吊销',
+    // 注册门控四码（registration_mode 三态审批）：与 Shared RelayErrorMapping
+    // （AccountRelay.swift）及服务端信封 message（kodeoff_relay.py REG_MSG_*）
+    // 逐字同串——website/check.sh 一致性断言钉死，改文案必须三端同步。
+    registration_closed: '服务器未开放注册',
+    invite_required: '此服务器注册需要邀请码',
+    invite_invalid: '邀请码无效或已过期',
+    invite_exhausted: '邀请码已被用完'
   };
 
   // ---- 状态 ----
@@ -59,13 +69,21 @@
   var viewLogin, viewInbox, relayInput, relayWarn, tabRow, tabEmail, tabCode,
       panelEmail, panelCode, emailInput, passwordInput, codeInput, closedNote,
       loginForm, loginSubmit, loginNotice, accountLine, refreshBtn, logoutBtn,
-      inboxStatus, emptyCard, inboxList, moreBtn;
+      inboxStatus, emptyCard, inboxList, moreBtn,
+      registerBlock, registerForm, regNotice, regStep1, regStep2, regInviteInput,
+      regEmailInput, regSendBtn, regSentNote, regPasswordInput, regPassword2Input,
+      regCodeInput, regCreateBtn, regBackBtn;
   var session = null;      // 当前会话（null=未登录）
   var sessionRevision = 0;
   var items = [];          // 投递行全量持有于 JS 数组，DOM 分批渲染
   var rendered = 0;        // 已渲染条数
   var loginMode = 'email'; // 'email' | 'code'
   var emailClosed = false; // 能力探测结论：此服务器未启用邮箱（只渲染账号码表单）
+  var regMode = 'unknown'; // 注册门控探测结论：'open'|'invite'|'closed'；unknown=未探/探针失败/地址已改
+  var regBusy = false;     // 注册请求进行中（发码/建号共用一把）
+  var regCodeSent = false; // 注册两步态：true=验证码已发（展示密码/验证码步）
+  var regEmail = '';       // 发码时冻结的邮箱（建号步原样回传，防两步间被改）
+  var regInviteCode = '';  // 发码时冻结的邀请码（建号步原样回传；服务端核销在建号事务）
   var busy = false;        // 登录提交进行中
   var loading = false;     // 收件箱加载进行中
 
@@ -244,15 +262,24 @@
     }
   }
 
+  // registration_mode 解析：契约值 open/invite/closed；缺键（旧服务端无此键）/
+  // 非字符串/未知值一律回落 open——open 与 closed 在网页同为不显示注册区块，回落
+  // open 不放大任何面，只是绝不让零信息（旧服务端）解锁新入口。
+  function parseRegistrationMode(v) {
+    if (v === 'open' || v === 'invite' || v === 'closed') return v;
+    return 'open';
+  }
+
   // 能力探测：GET /health。地址错/未启动/旧版服务端（无 CORS，fetch 被浏览器
-  // 拦成 TypeError）同面不猜——统一『无法连接服务器』。
+  // 拦成 TypeError）同面不猜——统一『无法连接服务器』。email_enabled 严格检查
+  // 零改动；registration_mode 缺键回落 open（显示策略见 applyRegistrationVisibility）。
   function probeHealth(base) {
     return fetch(base + '/health')
       .then(function (res) {
         if (!res.ok) return { fail: true };
         return readJson(res).then(function (j) {
           if (!j || j.status !== 'ok' || typeof j.email_enabled !== 'boolean') return { fail: true };
-          return { fail: false, email: j.email_enabled };
+          return { fail: false, email: j.email_enabled, registration: parseRegistrationMode(j.registration_mode) };
         });
       })
       .catch(function () { return { fail: true }; });
@@ -304,6 +331,8 @@
         if (useEmail) { done('此服务器未启用邮箱登录，请改用账号码登录'); return null; }
         // 用户本就在账号码页签：继续走账号码登录
       }
+      regMode = p.registration;      // 登录探针兼作注册模式刷新（invite → 注册区块显示）
+      applyRegistrationVisibility();
       var path = useEmail ? '/v1/email/login' : '/v1/login';
       var payload = useEmail
         ? { email: email, password: password, device_name: DEVICE_NAME }
@@ -344,6 +373,191 @@
     }).catch(function () {
       done(MSG.connect); // 登录请求网络断/被拦
     });
+  }
+
+  // ---- 注册（invite 邀请制，仅 invite 模式出现）----
+  // 显示策略（裁决：网页注册入口只在 invite 模式出现）：open 模式网页无注册——
+  // 无门控的发码步会烧全服发信配额（头注红线）；invite 下服务端把邀请码门放在
+  // 发信配额之前，配额只被持码人消耗，网页才安全开放。closed/unknown（未探/
+  // 探针失败/地址已改）一律隐藏——closed 无需专门面（本无入口）；探针失败=网页
+  // 无注册路，静态页无重探 UI，如实降级可接受，登录不受影响。emailClosed
+  // （email_enabled=false）时邮箱注册链路不存在，同隐藏。
+  function applyRegistrationVisibility() {
+    var show = regMode === 'invite' && !emailClosed;
+    registerBlock.hidden = !show;
+    if (!show) resetRegistration(); // 隐藏即弃置：邀请码/密码不残留 DOM
+  }
+
+  function resetRegistration() {
+    regBusy = false;
+    regCodeSent = false;
+    regEmail = '';
+    regInviteCode = '';
+    regInviteInput.value = '';
+    regEmailInput.value = '';
+    regPasswordInput.value = '';
+    regPassword2Input.value = '';
+    regCodeInput.value = '';
+    regSendBtn.disabled = false;
+    regSendBtn.textContent = '发送验证码';
+    regCreateBtn.disabled = false;
+    regCreateBtn.textContent = '创建账号';
+    regStep1.hidden = false;
+    regStep2.hidden = true;
+    regSentNote.textContent = '';
+    regNotice.textContent = '';
+    regNotice.hidden = true;
+  }
+
+  function showRegNotice(msg) { regNotice.textContent = msg; regNotice.hidden = false; }
+  function hideRegNotice() { regNotice.textContent = ''; regNotice.hidden = true; }
+
+  function setRegStep(codeSent) {
+    regCodeSent = codeSent;
+    regStep1.hidden = codeSent;
+    regStep2.hidden = !codeSent;
+  }
+
+  function onRegisterSubmit(ev) {
+    ev.preventDefault();
+    if (regCodeSent) onRegCreate(); else onRegSend();
+  }
+
+  // 第 1 步：POST /v1/email/register/code {email, invite_code} → 202。邀请码门在
+  // 服务端发信配额消费之前：无码/错码连发信桶都烧不到，网页发起才安全（头注红线
+  // 的收窄依据）。202 是反枚举面：邮箱已被注册时服务端发中性通知而非验证码，响应
+  // 零差异——已发送提示如实措辞不区分。email/invite_code 两步间冻结，建号步原样
+  // 回传（发码步只校验不消费，核销在 /v1/email/register 建号事务内）。
+  function onRegSend() {
+    if (regBusy) return;
+    hideRegNotice();
+    var n = normalizeBase(relayInput.value || DEFAULT_BASE);
+    if (!n) { showRegNotice('服务器地址需以 http:// 或 https:// 开头'); return; }
+    var invite = regInviteInput.value.trim();
+    var email = regEmailInput.value.trim();
+    if (!invite) { showRegNotice('请输入邀请码'); return; }
+    if (!email) { showRegNotice('请输入邮箱'); return; }
+    if (email.indexOf('@') < 1) { showRegNotice('请输入有效的邮箱地址'); return; }
+
+    regBusy = true;
+    var revision = sessionRevision;
+    regSendBtn.disabled = true;
+    regSendBtn.textContent = '发送中…';
+
+    function done(msg) {
+      if (revision !== sessionRevision) return;
+      regBusy = false;
+      regSendBtn.disabled = false;
+      regSendBtn.textContent = '发送验证码';
+      if (msg) showRegNotice(msg);
+    }
+
+    fetch(n.base + '/v1/email/register/code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, invite_code: invite })
+    }).then(function (res) {
+      return readJson(res).then(function (j) { return { res: res, j: j }; });
+    }).then(function (step) {
+      if (!step || revision !== sessionRevision) return;
+      if (step.res.ok) {
+        regEmail = email;
+        regInviteCode = invite;
+        setRegStep(true);
+        regBusy = false;
+        regSendBtn.disabled = false;
+        regSendBtn.textContent = '发送验证码';
+        // 服务端可控字符串（邮箱）经 textContent 渲染，无 HTML 解析（XSS 红线）
+        regSentNote.textContent = '若该邮箱可用于注册，验证码已发送至 ' + email
+          + '（10 分钟内有效）；没收到请检查垃圾邮件。';
+        return;
+      }
+      done(messageFor(step.j)); // 四门控码经 KNOWN 表冻结文案兜底
+    }).catch(function () {
+      done(MSG.connect);
+    });
+  }
+
+  // 第 2 步：POST /v1/email/register {email, password, code, device_name,
+  // invite_code} → 201 三件套入 session（复用 onLoginSubmit 的收尾形态）。
+  // 密码一致性/验证码形态先本地预检：服务端表单校验在邮箱验证码消费之前，
+  // 不烧码，但少打一次无谓请求总是对的。device_name 用 DEVICE_NAME。
+  function onRegCreate() {
+    if (regBusy) return;
+    hideRegNotice();
+    var n = normalizeBase(relayInput.value || DEFAULT_BASE);
+    if (!n) { showRegNotice('服务器地址需以 http:// 或 https:// 开头'); return; }
+    if (!regEmail || !regInviteCode) { setRegStep(false); showRegNotice('请先发送验证码'); return; }
+    var password = regPasswordInput.value;
+    var password2 = regPassword2Input.value;
+    var vcode = regCodeInput.value.trim();
+    if (!password || !password2) { showRegNotice('请输入密码'); return; }
+    if (password !== password2) { showRegNotice('两次输入的密码不一致'); return; }
+    if (password.length < 8) { showRegNotice('密码至少 8 个字符'); return; }
+    if (!/^[0-9]{6}$/.test(vcode)) { showRegNotice('请输入 6 位数字验证码'); return; }
+
+    regBusy = true;
+    var revision = sessionRevision;
+    regCreateBtn.disabled = true;
+    regCreateBtn.textContent = '创建中…';
+
+    function done(msg) {
+      if (revision !== sessionRevision) return;
+      regBusy = false;
+      regCreateBtn.disabled = false;
+      regCreateBtn.textContent = '创建账号';
+      if (msg) showRegNotice(msg);
+    }
+
+    fetch(n.base + '/v1/email/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: regEmail,
+        password: password,
+        code: vcode,
+        device_name: DEVICE_NAME,
+        invite_code: regInviteCode
+      })
+    }).then(function (res) {
+      return readJson(res).then(function (j) { return { res: res, j: j }; });
+    }).then(function (step) {
+      if (!step || revision !== sessionRevision) return;
+      if (step.res.ok && step.j && typeof step.j.device_token === 'string' && step.j.device_token) {
+        // 201 三件套入 session（形态同 onLoginSubmit 收尾：localStorage 单键、
+        // XSS 缓解同源）；随后弃置注册态——邀请码已核销，输入框即刻清空
+        session = {
+          device_token: step.j.device_token,
+          device_id: String(step.j.device_id || ''),
+          account_code: String(step.j.account_code || ''),
+          base: n.base
+        };
+        sessionRevision += 1;
+        lsSet(SESSION_KEY, JSON.stringify(session));
+        lsSet(RELAY_KEY, n.base); // 非敏感偏好：下次免输
+        resetRegistration();
+        hideLoginNotice();
+        showInboxView();
+        loadAccount();
+        loadInbox();
+        return;
+      }
+      done(messageFor(step.j)); // invite_invalid/exhausted 等门控面同出此处
+    }).catch(function () {
+      done(MSG.connect);
+    });
+  }
+
+  function onRegBack() {
+    // 返回登录：弃置密码/验证码（已发验证码作废不返还——服务端 TTL 收口），
+    // 邀请码/邮箱保留供修正重发；焦点交回登录邮箱框
+    setRegStep(false);
+    regPasswordInput.value = '';
+    regPassword2Input.value = '';
+    regCodeInput.value = '';
+    regSentNote.textContent = '';
+    hideRegNotice();
+    emailInput.focus();
   }
 
   // ---- 收件箱 ----
@@ -781,6 +995,20 @@
     emptyCard = $('inbox-empty');
     inboxList = $('inbox-list');
     moreBtn = $('btn-more');
+    registerBlock = $('register-block');
+    registerForm = $('register-form');
+    regNotice = $('register-notice');
+    regStep1 = $('register-step1');
+    regStep2 = $('register-step2');
+    regInviteInput = $('reg-invite');
+    regEmailInput = $('reg-email');
+    regSendBtn = $('reg-send');
+    regSentNote = $('reg-sent-note');
+    regPasswordInput = $('reg-password');
+    regPassword2Input = $('reg-password2');
+    regCodeInput = $('reg-code');
+    regCreateBtn = $('reg-create');
+    regBackBtn = $('reg-back');
 
     var saved = lsGet(RELAY_KEY);
     relayInput.value = saved || DEFAULT_BASE;
@@ -789,10 +1017,14 @@
     relayInput.addEventListener('input', function () {
       updateRelayWarn();
       if (emailClosed) { emailClosed = false; applyLoginMode(); } // 换地址后重探，恢复双 tab
+      regMode = 'unknown'; // 换地址：注册模式结论作废，区块先隐藏（载入/登录提交探针再定）
+      applyRegistrationVisibility();
     });
     tabEmail.addEventListener('click', function () { setMode('email'); });
     tabCode.addEventListener('click', function () { setMode('code'); });
     loginForm.addEventListener('submit', onLoginSubmit);
+    registerForm.addEventListener('submit', onRegisterSubmit); // 发送验证码/创建账号都是 submit，Enter 同路
+    regBackBtn.addEventListener('click', onRegBack);
     refreshBtn.addEventListener('click', function () { if (session) { loadAccount(); loadInbox(); } });
     logoutBtn.addEventListener('click', onLogout);
     moreBtn.addEventListener('click', renderBatch);
@@ -821,6 +1053,27 @@
     showLoginView();
   }
 
-  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', init);
-  else init();
+  // 载入即探注册模式（与登录提交共用 probeHealth）：invite → 显示注册区块；
+  // open/closed → 保持隐藏；探针失败 → 保持现状（hidden）——不因网络抖动收起已
+  // 显示区块，也绝不在零信息时解锁入口。顺带落地 emailClosed（email_enabled=
+  // false 载入即知，免去提交时才发现）。boot 与 init 分立的原因：tools/web-
+  // session-test 的测试挂钩只调 init()（其 document 无网络环境），载入探针只属
+  // 生产路径——挂进 init 会给既有 requests[0] 断言塞进杂散 fetch。
+  function probeRegistration() {
+    var n = normalizeBase(relayInput.value || DEFAULT_BASE);
+    if (!n) return; // 无地址可探：区块保持隐藏
+    probeHealth(n.base).then(function (p) {
+      if (p.fail) return;
+      if (!p.email) { emailClosed = true; applyLoginMode(); }
+      regMode = p.registration;
+      applyRegistrationVisibility();
+    });
+  }
+
+  function boot() {
+    init();
+    if (!session) probeRegistration(); // 已有会话直进收件箱，注册探针无意义
+  }
+  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
