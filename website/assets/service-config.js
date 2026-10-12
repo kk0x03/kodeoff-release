@@ -1,2 +1,2 @@
 // Generated from Config/Service.xcconfig; contains no credentials.
-window.KodeoffServiceConfiguration = Object.freeze({"baseURL": "http://127.0.0.1:18765", "showsServerConfiguration": false});
+window.KodeoffServiceConfiguration = Object.freeze({"baseURL": "https://relay.kodeoff.com", "showsServerConfiguration": false});
