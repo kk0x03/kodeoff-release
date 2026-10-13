@@ -41,6 +41,28 @@
 .register-note{font-size:12.5px;line-height:1.8;margin:0 0 14px}
 .register-sent{font-size:11.5px;line-height:1.7;margin:0 0 14px}
 
+/* 账号码注册腿（#register-code-block，invite+邮箱关闭才显示）：骨架照 .register-block 先例 */
+.register-code-block{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+
+/* 注册成功展示卡（#account-created-block）：对齐 iOS accountCreatedCard——账号码
+   r16+accent 1.5pt 描边、等宽大字（credentialTitle 同位）、user-select:all 点按
+   全选（iOS .textSelection(.enabled) 网页等价）；后果行警示色取 note-warn 同源
+   硬编码 #8a6116（style.css 无专用 warning token，不新造变量）。 */
+.account-created-block h2{font-size:22px;font-weight:600;letter-spacing:-.5px;margin:0 0 16px}
+.account-code-hero{margin:0 0 8px;padding:18px 14px;border:1.5px solid var(--accent);border-radius:16px;background:var(--panel);text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:26px;font-weight:600;letter-spacing:1px;color:var(--text);user-select:all;-webkit-user-select:all}
+.created-caption{font-size:11.5px;text-align:center;margin:0 0 14px}
+.created-copy-row{text-align:center;margin:0 0 16px}
+.created-warn{font-size:12px;line-height:1.8;background:var(--soft);border-radius:12px;padding:12px 14px;margin:0 0 6px}
+.created-warn p{margin:0 0 4px}
+.created-warn p:last-child{margin-bottom:0}
+.created-warn-lead{font-weight:600}
+.created-warn-fatal{color:#8a6116}
+
+/* 忘记密码入口（panel-email 内，W3）：文字链接形态的按钮；行贴密码框下方 */
+.forgot-row{margin:-6px 0 14px;text-align:right}
+.linklike{border:0;background:none;padding:0;color:var(--accent);font:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline}
+.linklike:focus{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+
 /* ---- 收件箱 ---- */
 .inbox-head h1{font-size:30px;font-weight:600;letter-spacing:-.7px;margin-bottom:8px}
 .account-line{font-size:12px;line-height:1.8;word-break:break-all}
