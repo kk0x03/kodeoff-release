@@ -64,10 +64,11 @@
 <p class="disclose">登录凭据保存在此浏览器的本地存储中；本页不加载第三方脚本。在公共电脑上请用完退出——退出会立即清除本机登录，并尝试吊销本浏览器的登录凭据。</p>
 </form>
 <!-- 注册区块（内测邀请制）：仅 registration_mode=invite 时由 app-login.js 能力探测
-显示；open 模式网页无注册入口（红线见 app-login.js 头注），closed/探针失败同隐藏。
-结构照 panel-email/tab-row/email-closed-note 先例：纯静态骨架 + hidden 切换，无路由；
-动态文案一律 JS textContent 渲染（XSS 纪律，app-login.js 头注），本块不含任何服务端
-可控字符串。 -->
+显示，并按 emailClosed 分两腿：邮箱启用 → 本块邮箱三步流；邮箱关闭 → 账号码注册
+腿 #register-code-block（单请求 /v1/register，见下）。open 模式网页无注册入口（红线
+见 app-login.js 头注），closed/探针失败同隐藏。结构照 panel-email/tab-row/
+email-closed-note 先例：纯静态骨架 + hidden 切换，无路由；动态文案一律 JS
+textContent 渲染（XSS 纪律，app-login.js 头注），本块不含任何服务端可控字符串。 -->
 <section id="register-block" class="register-block" aria-label="注册新账号" hidden>
 <p class="muted register-note">此服务器采用邀请制注册：输入邀请码与邮箱，验证后创建账号。</p>
 <p id="register-notice" class="note-error" aria-live="polite" hidden></p>
@@ -107,11 +108,53 @@
 </div>
 </form>
 </section>
-<!-- invite+emailClosed（邮箱未启用的邀请制服务器）形态：注册区块整体隐藏时，
-用说明行替代静默隐藏指路 App（W5）；账号码注册网页表单不补（与「账号码=注册
-响应才可见」的凭据心智冲突，iOS 已有纯账号码兜底，网页不跟）。显隐由
+<!-- 账号码注册腿（invite+邮箱关闭形态，生产 relay.kodeoff.com 即此形态）：邀请码+
+设备名单请求 POST /v1/register → 201 三件套。服务端邀请码门在字段校验前、端点零
+邮件消费（仅 register_limiter 10/h/IP 桶），网页放行不破发信配额红线——原 W5
+「账号码注册网页表单不补、指路 App」裁决因该形态在浏览器只剩一行死路说明被推翻
+（推翻账见 app-login.js 头注与 applyRegistrationVisibility 段注释）。邀请码前端只
+trim+非空预检：服务端 canonical 纠错收小写/INV- 前缀/连字符/OIL 手抄变体，前端不
+复制规范化逻辑。设备名预填 DEVICE_NAME 默认值可编辑（唯一用途是设备列表辨识）；
+预检 trim 非空+UTF-8 1-128 字节双向（与服务端 text_field 同尺）。显隐由
 applyRegistrationVisibility 统一裁决。 -->
-<p id="app-register-note" class="muted register-note" hidden>此服务器需通过 Kodeoff App 注册。</p>
+<section id="register-code-block" class="register-code-block" aria-label="账号码注册" hidden>
+<p class="muted register-note">此服务器采用邀请制注册：输入邀请码与设备名，即刻创建账号码账号。</p>
+<p id="register-code-notice" class="note-error" aria-live="polite" hidden></p>
+<form id="register-code-form" novalidate>
+<div class="field">
+<label for="reg-code-invite">邀请码</label>
+<input id="reg-code-invite" type="text" autocomplete="off" spellcheck="false" placeholder="INV-XXXXXXXX-XXXXXXXX">
+</div>
+<div class="field">
+<label for="reg-code-device">设备名</label>
+<input id="reg-code-device" type="text" autocomplete="off" spellcheck="false" value="Web Browser">
+</div>
+<button id="reg-code-create" type="submit" class="btn btn-primary btn-block">创建账号</button>
+</form>
+</section>
+<!-- 注册成功展示卡（账号码腿 201 的强制收尾）：对齐 iOS accountCreatedCard 整页
+二选一语义（RelaySetupView body switch，accountCreatedCard/setupForm 互斥渲染）——
+卡展示期间登录卡可视区归卡独占（登录表单/tab/邮箱关闭提示全隐，显隐边界见
+app-login.js showAccountCreatedCard），进入收件箱/登出/凭据吊销三入口经
+resetAccountCreatedCard 复原。披露行（粗体）为网页单端冻结串（iOS 的唯一凭据语义
+由 caption 与警告两行承载，此串仅网页可见）；警告两行与「账号码（登录凭据）」
+caption 与 iOS 可见文案逐字同串。account_code 经 JS textContent 渲染（服务端可控
+串，XSS 纪律）。 -->
+<section id="account-created-block" class="account-created-block" aria-label="账号已创建" hidden>
+<h2>账号已创建</h2>
+<div id="created-account-code" class="account-code-hero"></div>
+<p class="muted created-caption">账号码（登录凭据）</p>
+<p class="created-copy-row"><button id="created-copy" type="button" class="btn btn-secondary">复制账号码</button></p>
+<!-- 复制第三层兜底提示（clipboard reject + execCommand 均败时出现；文案 JS
+textContent 渲染。user-select:all 保底点按全选恒可达，本行只在双层皆败时上屏） -->
+<p id="created-copy-note" class="note-warn" hidden></p>
+<div class="created-warn">
+<p class="created-warn-lead">此账号未绑定邮箱、未设密码：账号码是唯一登录凭据。</p>
+<p class="muted">⚠️ 请立即抄录保存账号码：为其他设备配对时需要它</p>
+<p class="created-warn-fatal">若所有设备都被移除且账号码遗失，将无法再访问此账号</p>
+</div>
+<button id="created-enter" type="button" class="btn btn-primary btn-block">进入收件箱</button>
+</section>
 <!-- 忘记密码区块（W3 补腿；两步：/v1/email/reset/code → /v1/email/reset）：
 入口与注册区块同判据（invite+邮箱启用+探针成功，applyRegistrationVisibility 统一
 切换）。结构照 register-block 先例：纯静态骨架 + hidden 切换，无路由；动态文案
