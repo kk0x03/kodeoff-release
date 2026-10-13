@@ -13,10 +13,16 @@
  *   属性赋值非 HTML 解析，安全。URL 拼接一律 encodeURIComponent(record_name)。
  * - 4xx 一律不自动重试：服务端 login_guard 是全服持久熔断（20 次失败/600s），
  *   自动重试会烧全服登录名额殃及 native 端；401 分支只清凭据回登录页，不重试。
- * - 网页注册入口仅在 invite 模式出现：发码步持有效邀请码方可消耗全服发信配额
- *   （服务端把邀请码门放在发信配额之前，配额只被持码人消耗）；open 模式网页仍
- *   不做注册/重发验证码/密码重置——原红线对 open 保留：全服发信桶 30/h 共享，
- *   网页重发不节流会烧全服邮件配额（同址冷却 60s 失败不返还）。invite 模式的
+ * - 网页注册入口仅在 invite 模式出现，并按 emailClosed 分两腿：邮箱启用走既有
+ *   邮箱三步流（发码步持有效邀请码方可消耗全服发信配额——服务端把邀请码门放在
+ *   发信配额之前，配额只被持码人消耗）；邮箱关闭走账号码注册腿（invite+邮箱
+ *   关闭形态，生产 relay.kodeoff.com 即此形态）：单请求 POST /v1/register
+ *   {invite_code, device_name}，端点零邮件消费（仅 register_limiter 10/h/IP 桶，
+ *   邀请码门在字段校验前—— kodeoff_relay.py _register/_invite_gate），不触任何
+ *   发信配额，网页放行不破红线。原 W5「账号码注册网页表单不补、指路 App」裁决
+ *   因该形态在浏览器只剩一行死路说明（邀请码用户无路可走）被推翻。open 模式
+ *   网页仍不做注册/重发验证码/密码重置——原红线对 open 保留：全服发信桶 30/h
+ *   共享，网页重发不节流会烧全服邮件配额（同址冷却 60s 失败不返还）。invite 模式的
  *   密码重置（忘记密码）网页放行：一致性判据=「每请求是否有门前置的配额消费」
  *   ——invite 注册发码每请求重验邀请码（门在发信桶前），reset 服务端三态全放行
  *   且无任何门前置，native 两端均有入口（安装门槛构成滥用屏障），网页对齐 invite
@@ -125,7 +131,11 @@
       registerBlock, registerForm, regNotice, regStep1, regStep2, regInviteInput,
       regEmailInput, regSendBtn, regSentNote, regPasswordInput, regPassword2Input,
       regCodeInput, regCreateBtn, regBackBtn, regResendBtn,
-      forgotLink, appRegisterNote, forgotBlock, forgotForm, forgotNotice,
+      registerCodeBlock, registerCodeForm, registerCodeNotice, regCodeInviteInput,
+      regCodeDeviceInput, regCodeCreateBtn,
+      accountCreatedBlock, createdAccountCode, createdCopyBtn, createdCopyNote,
+      createdEnterBtn,
+      forgotLink, forgotBlock, forgotForm, forgotNotice,
       forgotStep1, forgotStep2, forgotEmailInput, forgotSendBtn, forgotSentNote,
       forgotPasswordInput, forgotPassword2Input, forgotCodeInput,
       forgotCreateBtn, forgotBackBtn,
@@ -143,6 +153,8 @@
   var regInviteCode = '';  // 发码时冻结的邀请码（建号步原样回传；服务端核销在建号事务）
   var regResendLeft = 0;   // 重发码冷却剩余秒数（0=可点；对齐服务端默认同址 60s）
   var regResendTimer = null;
+  var codeRegBusy = false; // 账号码注册腿请求进行中（单请求端点，无两步态）
+  var copyTimer = null;    // 展示卡复制按钮 2s 反馈定时器（照 regResendTimer 假时钟先例）
   var forgotBusy = false;  // 忘记密码请求进行中（发码/改密共用一把）
   var forgotCodeSent = false; // 忘记密码两步态
   var forgotEmail = '';    // 发码时冻结的邮箱（改密步原样回传）
@@ -314,10 +326,12 @@
     sessionRevision += 1;
     lsRemove(SESSION_KEY);
     resetInboxState();
-    // 注册/忘记密码态一并弃置（触发时必已登录、两区块不可见，无输入丢失风险）：
-    // 公共电脑上吊销回登录页不残留密码/验证码（隐私同 resetInboxState 收口理由）
+    // 注册/忘记密码/展示卡态一并弃置（触发时必已登录、三区块不可见，无输入丢失
+    // 风险）：公共电脑上吊销回登录页不残留密码/验证码（隐私同 resetInboxState
+    // 收口理由）；展示卡收起（stopCreatedCopyTimer 一并走）+登录面复原
     resetRegistration();
     resetForgot();
+    resetAccountCreatedCard();
     showLoginView();
     showLoginNotice(MSG.revoked);
   }
@@ -520,26 +534,31 @@
     });
   }
 
-  // ---- 注册（invite 邀请制，仅 invite 模式出现）----
+  // ---- 注册（invite 邀请制，仅 invite 模式出现，按 emailClosed 分两腿）----
   // 显示策略（裁决：网页注册入口只在 invite 模式出现）：open 模式网页无注册——
   // 无门控的发码步会烧全服发信配额（头注红线）；invite 下服务端把邀请码门放在
   // 发信配额之前，配额只被持码人消耗，网页才安全开放。closed/unknown（未探/
   // 探针失败/地址已改）一律隐藏——closed 无需专门面（本无入口）；探针失败=网页
-  // 无注册路，静态页无重探 UI，如实降级可接受，登录不受影响。emailClosed
-  // （email_enabled=false）时邮箱注册链路不存在，同隐藏。
+  // 无注册路，静态页无重探 UI，如实降级可接受，登录不受影响。
+  // 两腿分流（头注推翻账）：邮箱启用（!emailClosed）→ 既有邮箱三步流；邮箱关闭
+  // → 账号码注册腿（单请求 /v1/register，零邮件消费，邀请码门在字段校验前）。
+  // (regMode='unknown' ∧ emailClosed=true) 为生产不可达态：换地址先复位
+  // emailClosed 再置 unknown（init 换地址分支），代码里该组合自然落「两腿全隐」
+  // 侧，无需专门分支。
   function applyRegistrationVisibility() {
-    var show = regMode === 'invite' && !emailClosed;
-    registerBlock.hidden = !show;
-    // 忘记密码入口与注册区块同判据（invite+邮箱启用+探针成功；open/closed/
+    var emailReg = regMode === 'invite' && !emailClosed; // 邮箱三步流（既有腿）
+    var codeReg = regMode === 'invite' && emailClosed;   // 账号码单请求腿（新腿）
+    registerBlock.hidden = !emailReg;
+    registerCodeBlock.hidden = !codeReg;
+    // 忘记密码入口与邮箱腿同判据（invite+邮箱启用+探针成功；open/closed/
     // unknown 一律不出现——不猜，门控裁决见头注红线与忘记密码段注释）
-    forgotLink.hidden = !show;
-    // invite+emailClosed（邮箱未启用的邀请制服务器）：注册区块整体隐藏，改为
-    // 在登录区渲染说明行指路 App（W5；账号码注册网页表单不补——与「账号码=
-    // 注册响应才可见」的凭据心智冲突，iOS 已有纯账号码兜底，网页不跟）
-    appRegisterNote.hidden = !(regMode === 'invite' && emailClosed);
-    if (!show) {
+    forgotLink.hidden = !emailReg;
+    if (!emailReg) {
       resetForgot(); // 隐藏即弃置：忘记密码两步态不残留
       resetRegistration(); // 隐藏即弃置：邀请码/密码不残留 DOM
+    }
+    if (!codeReg) {
+      resetCodeRegistration(); // 隐藏即弃置：账号码腿输入不残留（设备名回默认值）
     }
   }
 
@@ -564,6 +583,22 @@
     regNotice.hidden = true;
     stopRegCooldown();
   }
+
+  // 账号码腿复位（照 resetRegistration 模子裁剪：单请求端点，无两步态/无冷却）。
+  // 设备名回预填默认值而非空串（DEVICE_NAME 恒合法，零摩擦）；邀请码清空（核销
+  // 后不留屏上）。
+  function resetCodeRegistration() {
+    codeRegBusy = false;
+    regCodeInviteInput.value = '';
+    regCodeDeviceInput.value = DEVICE_NAME;
+    regCodeCreateBtn.disabled = false;
+    regCodeCreateBtn.textContent = '创建账号';
+    registerCodeNotice.textContent = '';
+    registerCodeNotice.hidden = true;
+  }
+
+  function showCodeRegNotice(msg) { registerCodeNotice.textContent = msg; registerCodeNotice.hidden = false; }
+  function hideCodeRegNotice() { registerCodeNotice.textContent = ''; registerCodeNotice.hidden = true; }
 
   function showRegNotice(msg) { regNotice.textContent = msg; regNotice.hidden = false; }
   function hideRegNotice() { regNotice.textContent = ''; regNotice.hidden = true; }
@@ -789,6 +824,152 @@
     regSentNote.textContent = '';
     hideRegNotice();
     emailInput.focus();
+  }
+
+  // ---- 账号码注册腿（invite+邮箱关闭形态；单请求 POST /v1/register）----
+  // 服务端门控时序（kodeoff_relay.py _register）：closed 总闸 → register_limiter
+  // 10/h/IP（429，桶无邀请码豁免）→ 读 JSON 体 → _invite_gate（只校验不消费；
+  // required/invalid/exhausted 三张 403 面）→ device_name 1-128 字节校验 → 建号
+  // +核销单层事务 → 201 {account_code, device_id, device_token}。前端只 trim+非空
+  // 预检（邀请码规范化——小写/INV- 前缀/连字符/OIL 手抄变体——全在服务端
+  // canonical_invite_code 收口，前端不复制）；设备名 utf8Length 双向预检与服务端
+  // text_field 同尺，消 400 技术前缀面。请求走裸 fetch：api() 要求已有 session
+  // （!owner 短路），注册是会话前请求（同 sendRegCode/onRegCreate 先例），无
+  // Authorization 头。
+  function onCodeRegCreate(ev) {
+    if (ev) ev.preventDefault(); // form submit 入口（Enter 同路）；hook 直调无 event
+    if (codeRegBusy) return;
+    hideCodeRegNotice();
+    var n = normalizeBase(relayInput.value || DEFAULT_BASE);
+    if (!n) { showCodeRegNotice('服务器地址需以 http:// 或 https:// 开头'); return; }
+    var invite = regCodeInviteInput.value.trim();
+    var device = regCodeDeviceInput.value.trim();
+    if (!invite) { showCodeRegNotice('请输入邀请码'); return; }
+    if (!device) { showCodeRegNotice('请输入设备名'); return; }
+    var deviceBytes = utf8Length(device);
+    if (deviceBytes < 1 || deviceBytes > 128) { showCodeRegNotice('设备名需 1-128 字节（UTF-8）'); return; }
+
+    codeRegBusy = true;
+    regCodeCreateBtn.disabled = true;
+    regCodeCreateBtn.textContent = '创建中…';
+    var revision = sessionRevision;
+
+    function release() {
+      codeRegBusy = false; // 复位在 revision 守卫外（W2：迟到响应必解忙）
+      regCodeCreateBtn.disabled = false;
+      regCodeCreateBtn.textContent = '创建账号';
+    }
+    function done(msg) {
+      release();
+      if (revision !== sessionRevision) return;
+      if (msg) showCodeRegNotice(msg);
+    }
+
+    fetch(n.base + '/v1/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ invite_code: invite, device_name: device })
+    }).then(function (res) {
+      return readJson(res).then(function (j) { return { res: res, j: j }; });
+    }).then(function (step) {
+      if (!step || revision !== sessionRevision) { release(); return; }
+      if (step.res.ok && step.j && typeof step.j.device_token === 'string' && step.j.device_token) {
+        // 201 三件套入 session（形态同 onRegCreate 收尾：localStorage 单键、
+        // XSS 缓解同源）；随后先展示账号码卡（KOD- 码是唯一登录凭据——账号码
+        // 注册无邮箱无密码，卡只拦「进收件箱」一步，进卡前凭据已落地）
+        session = {
+          device_token: step.j.device_token,
+          device_id: String(step.j.device_id || ''),
+          account_code: String(step.j.account_code || ''),
+          base: n.base
+        };
+        sessionRevision += 1;
+        lsSet(SESSION_KEY, JSON.stringify(session));
+        lsSet(RELAY_KEY, n.base); // 非敏感偏好：下次免输
+        hideLoginNotice();
+        showAccountCreatedCard(step.j.account_code);
+        return;
+      }
+      done(messageFor(step.j)); // 四门控码/bad_request/漂移族经 KNOWN 表+透传兜底
+    }).catch(function () {
+      done(MSG.connect);
+    });
+  }
+
+  // 展示卡显隐边界（对齐 iOS accountCreatedCard 整页二选一：RelaySetupView
+  // body switch accountCreatedCard/setupForm 互斥渲染）——卡独占登录卡可视区
+  // （仅余 h1 与卡），登录表单绝不与卡同屏。进入顺序：先弃置账号码腿输入
+  // （核销后不残留屏上），再隐登录面四件，最后上卡。
+  function showAccountCreatedCard(code) {
+    resetCodeRegistration();
+    registerCodeBlock.hidden = true;
+    loginForm.hidden = true;
+    tabRow.hidden = true;
+    closedNote.hidden = true;
+    hideLoginNotice();
+    stopCreatedCopyTimer(); // 复制按钮归位（防登出后再注册二次进卡残留「已复制 ✓」）
+    // account_code 是服务端可控串——textContent 渲染，无 HTML 解析（XSS 红线，
+    // loadAccount 先例）；user-select:all（CSS）点按即全选
+    createdAccountCode.textContent = String(code || '');
+    accountCreatedBlock.hidden = false;
+  }
+
+  // 展示卡唯一回滚点，三入口挂接：onCreatedEnter / onLogout / handleRevoked。
+  // tabRow/closedNote/panel 由 applyLoginMode 按 emailClosed 单点恢复（invite+
+  // emailClosed 格恢复为「只账号码 tab+提示」登录形态）。
+  function resetAccountCreatedCard() {
+    stopCreatedCopyTimer();
+    createdAccountCode.textContent = '';
+    accountCreatedBlock.hidden = true;
+    loginForm.hidden = false;
+    applyLoginMode();
+  }
+
+  // 复制三层兜底照 copyText/legacyCopy 先例：window.navigator.clipboard（vm 与
+  // 旧环境无 navigator——必须经 window 前缀判空）→ reject/缺席落 legacyCopy
+  // （execCommand 同步兜底）→ 仍败提示手动全选（user-select:all 保底恒可达）。
+  function copyAccountCode() {
+    var code = createdAccountCode.textContent;
+    if (!code) return; // 卡未展示（防御）
+    var viaApi = (window.navigator && window.navigator.clipboard && window.navigator.clipboard.writeText)
+      ? window.navigator.clipboard.writeText(code).then(function () { return true; }, function () { return false; })
+      : Promise.resolve(false);
+    viaApi.then(function (ok) {
+      if (ok) { createdCopyFeedback(); return; }
+      if (legacyCopy(code)) { createdCopyFeedback(); return; }
+      createdCopyNote.textContent = '自动复制失败，请点按账号码全选后手动复制（⌘C/Ctrl+C）';
+      createdCopyNote.hidden = false;
+    });
+  }
+
+  // 复制成功反馈：按钮 2s 变「已复制 ✓」后复原（setTimeout 链假时钟可测，照
+  // beginRegCooldown 先例：先 stop 清旧 timer，再置新态起表）。
+  function createdCopyFeedback() {
+    stopCreatedCopyTimer();
+    createdCopyNote.hidden = true;
+    createdCopyBtn.textContent = '已复制 ✓';
+    copyTimer = setTimeout(function () {
+      copyTimer = null;
+      createdCopyBtn.textContent = '复制账号码';
+    }, 2000);
+  }
+
+  // 复制定时器清理（照 stopRegCooldown 先例：clearTimeout+置 null+文案复位）。
+  // 挂进 resetAccountCreatedCard——防登出/吊销/进入收件箱后迟到 timer 写已隐藏
+  // 按钮（W2 同源理由）。
+  function stopCreatedCopyTimer() {
+    if (copyTimer !== null) { clearTimeout(copyTimer); copyTimer = null; }
+    createdCopyBtn.textContent = '复制账号码';
+  }
+
+  // 进入收件箱：收卡复原登录面（账号码格回到「只账号码 tab」形态）→ 进收件箱
+  // 首拉（照 onLoginSubmit/onRegCreate 收尾形态；/v1/account 即在 account-line
+  // 常显「账号码 KOD-…」二次曝光）。
+  function onCreatedEnter() {
+    resetAccountCreatedCard();
+    showInboxView();
+    loadAccount();
+    loadInbox();
   }
 
   // ---- 忘记密码（W3 补腿；仅 invite+邮箱启用+探针成功出现，入口与注册区块同
@@ -1463,10 +1644,11 @@
     var revision = sessionRevision;
     lsRemove(SESSION_KEY);
     resetInboxState();
-    // 注册/忘记密码态一并弃置（改前只清登录表单，登出后区块残留 step2 密码/
+    // 注册/忘记密码/展示卡态一并弃置（改前只清登录表单，登出后区块残留 step2 密码/
     // 验证码输入值与旧提示——公共电脑隐私面；resetRegistration 清 5 个输入）
     resetRegistration();
     resetForgot();
+    resetAccountCreatedCard();
     passwordInput.value = '';
     codeInput.value = '';
     showLoginView();
@@ -1597,7 +1779,17 @@
     regBackBtn = $('reg-back');
     regResendBtn = $('reg-resend');
     forgotLink = $('forgot-link');
-    appRegisterNote = $('app-register-note');
+    registerCodeBlock = $('register-code-block');
+    registerCodeForm = $('register-code-form');
+    registerCodeNotice = $('register-code-notice');
+    regCodeInviteInput = $('reg-code-invite');
+    regCodeDeviceInput = $('reg-code-device');
+    regCodeCreateBtn = $('reg-code-create');
+    accountCreatedBlock = $('account-created-block');
+    createdAccountCode = $('created-account-code');
+    createdCopyBtn = $('created-copy');
+    createdCopyNote = $('created-copy-note');
+    createdEnterBtn = $('created-enter');
     forgotBlock = $('forgot-block');
     forgotForm = $('forgot-form');
     forgotNotice = $('forgot-notice');
@@ -1628,6 +1820,9 @@
     registerForm.addEventListener('submit', onRegisterSubmit); // 发送验证码/创建账号都是 submit，Enter 同路
     regBackBtn.addEventListener('click', onRegBack);
     regResendBtn.addEventListener('click', onRegResend); // step2 重发（60s 冷却，W5）
+    registerCodeForm.addEventListener('submit', onCodeRegCreate); // 账号码腿单请求，Enter 同路
+    createdCopyBtn.addEventListener('click', copyAccountCode);
+    createdEnterBtn.addEventListener('click', onCreatedEnter);
     forgotLink.addEventListener('click', onForgotClick); // 忘记密码入口（W3，invite 限定）
     forgotForm.addEventListener('submit', onForgotSubmit); // 发码/重置都是 submit，Enter 同路
     forgotBackBtn.addEventListener('click', onForgotBack);
