@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kodeoff：免登录文件分享</title>
+<meta name="description" content="无需账号：把单个文件拖入网页，生成 24 小时内有效、最多可下载 20 次的分享链接，到期自动从服务器删除。">
+<meta name="theme-color" content="#fbfbfd">
+<meta property="og:title" content="Kodeoff：免登录文件分享">
+<meta property="og:description" content="无需账号：把单个文件拖入网页，生成 24 小时内有效、最多可下载 20 次的分享链接，到期自动从服务器删除。">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="./assets/style.css">
+<link rel="stylesheet" href="./assets/app-login.css">
+<script src="./assets/service-config.js" defer></script>
+</head>
+<body class="native" id="top">
+<a class="skip" href="#main">跳到主要内容</a>
+<main id="main" class="app-main">
+<p class="back-home"><a href="./index.html">← 返回官网首页</a></p>
+
+<!-- 免登录分享页（匿名档 P1，D1 平铺路由）：骨架照 app.html 登录卡（纯静态 DOM
++ hidden 切换，无路由），四态一段式：拖拽区 → 校验/进度（文件卡）→ 完成态链接卡
+→ 错误态。所有动态文案一律 textContent 渲染（file_name 与错误 message 都是服务端
+可控字符串，XSS 纪律同 app-login.js 头注）；本页内联脚本单页专用，不进 assets/
+（check.sh 文件计数 16 的口径）也不复用 app-login.js（绑会话/收件箱 DOM，不可
+共享——匿名管线零会话语义）。 -->
+<section class="send-card" aria-label="免登录文件分享">
+<h1>免登录文件分享</h1>
+<p class="muted intro-note">无需账号：选择一个文件，生成一条分享链接发给对方。链接 24 小时内有效、最多可被下载 20 次，到期即从服务器自动删除。</p>
+<noscript><p class="note-error">此页面需要启用 JavaScript 才能选择并上传文件；本页为纯静态页，不加载任何第三方脚本。</p></noscript>
+<p id="send-idle-note" class="send-status" aria-live="polite" hidden></p>
+
+<!-- 段 1 · 初始态：拖拽区。移动端/桌面点选同入口（点击触发 hidden file input，
+单发无 multiple，app.html:209 先例）；不设 accept 属性——黑名单语义无法用白名单
+accept 表达（会误拦大量允许的类型），扩展名拦截走 JS 预检（UX 层）+ 服务端
+create 415（权威闸）。 -->
+<section id="send-stage-idle" aria-label="选择文件">
+<div id="send-drop" class="send-drop" role="button" tabindex="0" aria-label="拖文件到这里，或点击选择要分享的文件">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m-5 5 5-5 5 5M5 18v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"></path></svg>
+<p class="send-drop-title">拖文件到这里，或点击选择</p>
+<p class="send-drop-hint">单文件不超过 100 MB · 上传与下载速度取决于你的网络与服务器所在地区</p>
+</div>
+<p class="send-agree">上传即表示同意<a href="./terms.html">〈服务条款〉</a>并确认不传播违规内容。</p>
+<input id="send-input" type="file" hidden>
+</section>
+
+<!-- 段 2/3 · 就绪态+上传态：文件卡（清单）与进度条同面，状态行区分阶段。
+哈希阶段无字节进度、不假装进度条（app-login.js 既有纪律）；进度条走 XHR
+upload.onprogress，进度语义由状态行承载（bar 对读屏 aria-hidden）。 -->
+<section id="send-stage-busy" aria-label="上传进度" hidden>
+<div class="send-file-card">
+<p id="send-file-name" class="send-file-name"></p>
+<p id="send-file-meta" class="send-file-meta"></p>
+</div>
+<p id="send-status" class="send-status" aria-live="polite"></p>
+<div id="send-bar" class="send-bar" aria-hidden="true"><div id="send-fill" class="send-fill"></div></div>
+<div class="send-actions"><button id="send-cancel" type="button" class="btn btn-secondary">取消上传</button></div>
+</section>
+
+<!-- 段 4/5 · 完成态：链接大字卡（等宽+user-select:all 点按全选+复制三层兜底，
+照 app.html created-copy 先例）+ 失效倒计时 + 次数上限 + 保存凭据警告 + 销毁
+确定性注记（与 relay /s/ 页双语文案同串）。owner_secret 只在本页内存：刷新或
+关闭即失，P1 不做「我的链接」（D12）。 -->
+<section id="send-stage-done" aria-label="分享链接已生成" hidden>
+<p id="send-link" class="send-link-hero"></p>
+<p class="send-caption">分享链接（点按可全选）</p>
+<div class="send-actions">
+<button id="send-copy" type="button" class="btn btn-primary">复制链接</button>
+<button id="send-again" type="button" class="btn btn-secondary">再传一个</button>
+</div>
+<p id="send-copy-note" class="note-warn" hidden></p>
+<div class="send-warn">
+<p id="send-expires" class="send-warn-lead"></p>
+<p>最多可被下载 20 次。</p>
+<p class="send-warn-fatal">请立即保存此链接；此页面关闭后无法找回链接本身。</p>
+</div>
+<p class="send-note">任何获得此链接的人都可以下载该文件；链接到期、达到下载次数或流量额度用尽后，文件将从服务器自动删除。</p>
+<p class="send-note send-note-en">Anyone with this link can download the file. It is deleted automatically once the link expires.</p>
+</section>
+
+<!-- 段 6 · 错误态：登记失败（无从恢复）只见「再传一个」；已登记后失败（断线/
+422/400 size_mismatch/5xx）可「重试」——先凭 owner_secret 查状态，未完成则重新
+PUT 整个文件（PUT 幂等分支同面）。确定性失败（413/415/429 等）不给重试按钮：
+重 PUT 必然再败且空烧当小时 PUT 桶。 -->
+<section id="send-stage-error" aria-label="上传出错" hidden>
+<p id="send-error-msg" class="send-status is-error" aria-live="polite"></p>
+<div class="send-actions">
+<button id="send-retry" type="button" class="btn btn-primary">重试</button>
+<button id="send-error-again" type="button" class="btn btn-secondary">再传一个</button>
+</div>
+<p class="send-note">重试会先查询此文件的上传状态：若服务器已收到完整文件会直接给出链接，否则重新上传整个文件。</p>
+</section>
+
+<!-- 导流位（§3.5）：镜像 index 页脚结构，匿名页是漏斗入口——主叙事让给能力句 -->
+<p class="send-pitch">更多能力在 Kodeoff App：直达设备的收件箱、更大文件、管理你的链接。</p>
+<div class="send-cta"><a class="btn btn-primary" href="./index.html#download">下载 App</a><a class="btn btn-secondary" href="./app.html">网页版</a></div>
+<p class="send-agree send-disclose">管理凭据只存在于本页面内存：刷新或关闭页面后链接本身无法找回。取消或失败的上传会释放占用的服务器空间，但本小时的分享次数不会退还。本页不加载第三方脚本。</p>
+</section>
+</main>
+<footer><a class="brand" href="./index.html"><img src="./favicon.svg" width="28" height="28" alt="">Kodeoff</a><div class="footer-links"><a href="./terms.html">条款</a><a href="./privacy.html">隐私</a><a href="./report.html">举报滥用</a><a href="./index.html#download">下载 App</a><a href="./app.html">网页版</a></div></footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---- 契约常量：服务端 relayconfig SPEC 是唯一权威，本页只读与预检 ----
+  // 100MiB 与 app-login.js UPLOAD_MAX、服务端 anon-max-file-bytes 同值（R7 防
+  // 双口径：值漂移由服务端 contract 413 探针与本页本地预检双向钉住）。
+  var UPLOAD_MAX = 100 * 1024 * 1024;
+  var NAME_MAX = 1024; // 文件名 UTF-8 字节上限（服务端 text_field 同尺）
+  // 扩展名黑名单 JS 预检（D10）：与服务端 share_ext_banned 同清单同规则——先剥
+  // 尾点/尾空格再取末段全等（evil.exe. / evil.exe␣ 不放行；无后缀放行）。本表
+  // 只是发请求前的友好拦截，不是安全边界（浏览器侧一切预检都可绕；权威闸是
+  // 服务端 create 415）。清单在 terms.html 公示（check.sh 同串断言钉网页内
+  // 自洽半边，服务端半边由注释同源纪律钉）；页面错误文案不透露细节。
+  var BANNED_EXT = ['exe', 'scr', 'cpl', 'msi', 'bat', 'cmd', 'jar', 'docm'];
+
+  // BASE 在 init() 里读：service-config.js 是 defer 脚本，本内联脚本解析时
+  // KodeoffServiceConfiguration 尚未注入（时序见文件尾部 init 处注释）。
+  var BASE = '';
+
+  var MSG = {
+    connect: '暂时无法连接，请稍后重试',
+    fallback: '操作失败，请稍后再试',
+    noBase: '此页面未配置分享服务地址，无法上传',
+    sizeFail: '无法读取文件大小，请重试',
+    nameFail: '无法读取文件名，请重命名后重试',
+    nameTooLong: '文件名过长（上限 1024 字节），请重命名后重试',
+    tooLarge: '文件超过匿名分享单文件上限（100 MB）',
+    noArrayBuffer: '当前浏览器版本过旧，无法读取文件内容，请更换现代浏览器后重试',
+    noSubtle: '当前页面不是 HTTPS，浏览器未提供加密模块，无法计算文件校验值；请通过 HTTPS 访问本页再上传',
+    readFail: '无法读取文件内容，请重试'
+  };
+
+  // 匿名域错误码 → 固定文案（信封 message 缺失时的兜底；有 message 原样透传）。
+  // 前六串与服务端信封 message 逐字同串（契约⑭：415/429/507×2/413；服务端半边
+  // 由 contract_checks 钉死，改文案必须两端同步）。其余码为网页侧兜底串，服务端
+  // message 正常时不可见。
+  var KNOWN = {
+    banned_extension: '此类文件类型不被允许分享（安全原因）',
+    rate_limited: '操作过于频繁（每小时有次数限制）',
+    anon_pool_full: '服务器匿名通道已满，请稍后再试',
+    anon_egress_pause: '服务器匿名通道已满，请稍后再试',
+    storage_full: '服务器存储已满，请稍后再试',
+    file_too_large: '文件超过匿名分享单文件上限（100 MB）',
+    owner_invalid: '管理凭据无效，无法继续本次上传',
+    unknown_share: '该分享不存在或已被删除',
+    length_required: '缺少文件长度信息，请重试',
+    size_mismatch: '文件大小与登记信息不符，请重试',
+    checksum_mismatch: '文件校验值与服务端不一致，请重试',
+    share_token_conflict: '服务器繁忙，请重试',
+    bad_request: '请求参数有误，请刷新页面后重试'
+  };
+
+  // ---- DOM（照 app-login.js $ 先例）----
+  var d = document;
+  function $(id) { return d.getElementById(id); }
+  var stageIdle = $('send-stage-idle'), stageBusy = $('send-stage-busy'),
+      stageDone = $('send-stage-done'), stageError = $('send-stage-error'),
+      idleNote = $('send-idle-note'), dropEl = $('send-drop'), inputEl = $('send-input'),
+      fileNameEl = $('send-file-name'), fileMetaEl = $('send-file-meta'),
+      statusEl = $('send-status'), fillEl = $('send-fill'),
+      cancelBtn = $('send-cancel'), linkEl = $('send-link'),
+      copyBtn = $('send-copy'), againBtn = $('send-again'), copyNote = $('send-copy-note'),
+      expiresEl = $('send-expires'), errorMsgEl = $('send-error-msg'),
+      retryBtn = $('send-retry'), errorAgainBtn = $('send-error-again');
+
+  // ---- 状态 ----
+  // current：本次上传的全部上下文，只存内存变量（含 owner_secret——绝不写入
+  // localStorage 等任何持久化位置，D12 P2 才做「我的链接」）。字段：file/
+  // fileName/fileSize/sha/shareId/ownerSecret/path/expiresAt。
+  var current = null;
+  var busyXhr = null;        // 上传中的 XHR（取消时 abort）
+  var cancelled = false;     // 取消旗标：一切异步回调进门先查，取消后静默
+  var countdownTimer = null; // 完成态倒计时（30s 刷新剩余时间）
+
+  var stages = { idle: stageIdle, busy: stageBusy, done: stageDone, error: stageError };
+
+  function setStage(name) {
+    for (var key in stages) {
+      if (Object.prototype.hasOwnProperty.call(stages, key)) stages[key].hidden = key !== name;
+    }
+  }
+
+  function setStatus(text, isError) {
+    statusEl.textContent = text;
+    statusEl.className = isError ? 'send-status is-error' : 'send-status';
+  }
+
+  function showIdleNote(text, isError) {
+    idleNote.textContent = text;
+    idleNote.className = isError ? 'send-status is-error' : 'send-status';
+    idleNote.hidden = !text;
+  }
+
+  function setProgress(pct) { fillEl.style.width = (pct > 0 ? pct : 0) + '%'; }
+
+  function stopCountdown() {
+    if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+  }
+
+  // ---- 小工具（fmtBytes/bytesToHex 照 app-login.js 同构自持，不共享文件）----
+  function fmtBytes(n) {
+    if (typeof n !== 'number' || !isFinite(n) || n < 0) return '未知大小';
+    if (n < 1024) return n + ' B';
+    var u = ['KB', 'MB', 'GB', 'TB'], v = n / 1024, i = 0;
+    while (v >= 1024 && i < u.length - 1) { v /= 1024; i++; }
+    return (Math.round(v * 10) / 10) + ' ' + u[i];
+  }
+
+  function bytesToHex(u8) {
+    var hex = '', CH = '0123456789abcdef';
+    for (var i = 0; i < u8.length; i++) hex += CH[u8[i] >> 4] + CH[u8[i] & 15];
+    return hex;
+  }
+
+  function extBanned(name) {
+    var clean = String(name || '').replace(/[. ]+$/, '').toLowerCase();
+    var dot = clean.lastIndexOf('.');
+    if (dot < 0) return false; // 无后缀放行（D10 口径；服务端同规则为权威）
+    return BANNED_EXT.indexOf(clean.slice(dot + 1)) !== -1;
+  }
+
+  function humanRemaining(ms) {
+    if (typeof ms !== 'number' || !isFinite(ms) || ms <= 0) return '不到 1 分钟';
+    var min = Math.ceil(ms / 60000);
+    if (min < 1) return '不到 1 分钟';
+    if (min < 60) return min + ' 分钟';
+    var h = Math.floor(min / 60), m = min % 60;
+    if (h < 24) return m ? h + ' 小时 ' + m + ' 分钟' : h + ' 小时';
+    var days = Math.floor(h / 24), hh = h % 24;
+    return days + ' 天' + (hh ? ' ' + hh + ' 小时' : '');
+  }
+
+  function readJson(res) {
+    // 统一按 Content-Type 分流：只有 application/json 才解析，非 JSON 一律 null
+    var ct = res.headers.get('Content-Type') || '';
+    if (ct.indexOf('application/json') === -1) return Promise.resolve(null);
+    return res.json().then(
+      function (j) { return (j && typeof j === 'object') ? j : null; },
+      function () { return null; });
+  }
+
+  function parseJsonText(text, ct) { // XHR 版（无 headers.get）
+    if (!text || String(ct).indexOf('application/json') === -1) return null;
+    try {
+      var j = JSON.parse(text);
+      return (j && typeof j === 'object') ? j : null;
+    } catch (e) { return null; }
+  }
+
+  // 错误文案三层兜底（messageFor 同构）：KNOWN 码透传/兜底 → 未知码带 message
+  // 前缀 → 非 JSON/断线给连接失败
+  function messageFor(env) {
+    if (env && typeof env.error === 'string') {
+      if (Object.prototype.hasOwnProperty.call(KNOWN, env.error)) {
+        return (typeof env.message === 'string' && env.message) ? env.message : KNOWN[env.error];
+      }
+      if (typeof env.message === 'string' && env.message) return '服务器返回错误：' + env.message;
+      return MSG.fallback;
+    }
+    return MSG.connect;
+  }
+
+  // ---- 四态切换与收尾 ----
+  function showError(msg, canRetry) {
+    stopCountdown();
+    errorMsgEl.textContent = msg;
+    retryBtn.hidden = !canRetry;
+    setStage('error');
+  }
+
+  function resetToIdle() {
+    cancelled = true;
+    if (busyXhr) { try { busyXhr.abort(); } catch (e) {} }
+    busyXhr = null;
+    current = null;
+    stopCountdown();
+    setProgress(0);
+    setStatus('', false);
+    copyBtn.textContent = '复制链接';
+    copyNote.hidden = true;
+    showIdleNote('', false);
+    setStage('idle');
+  }
+
+  function finishShare() {
+    var cur = current;
+    if (!cur) return;
+    current = null; // 链接已交付；P1 完成态无管理入口，owner_secret 即弃
+    stopCountdown();
+    linkEl.textContent = BASE + cur.path; // path="/s/<token>"，拼回服务端基址
+    copyNote.hidden = true;
+    var expiresAt = cur.expiresAt;
+    var renderExpires = function () {
+      expiresEl.textContent = '链接将于 ' + humanRemaining(expiresAt - Date.now()) + ' 后失效（24 小时）。';
+    };
+    renderExpires();
+    countdownTimer = setInterval(renderExpires, 30000);
+    setStage('done');
+  }
+
+  // ---- ① 本地预检（零网络）→ ② sha256 整读单遍 → ③ 登记 → ④ PUT 字节 ----
+  // 四步照 app-login.js uploadFile 模子，但完全无会话语义：裸 fetch/裸 XHR、
+  // 无 Authorization；管理凭据走 X-Kodeoff-Owner-Secret 请求头。PUT body 传
+  // File 本体，浏览器流式读盘并自动带 Content-Length（不触发服务端 411）。
+  function startWithFile(file) {
+    resetToIdle();
+    if (!BASE) { showIdleNote(MSG.noBase, true); return; }
+    if (!file || typeof file !== 'object') return;
+    if (typeof file.size !== 'number' || file.size < 0) { showIdleNote(MSG.sizeFail, true); return; }
+    if (file.size > UPLOAD_MAX) { showIdleNote(MSG.tooLarge, true); return; }
+    if (typeof file.arrayBuffer !== 'function') { showIdleNote(MSG.noArrayBuffer, true); return; }
+    var name = String(file.name || '');
+    var nameBytes = -1;
+    try { nameBytes = new TextEncoder().encode(name).length; } catch (e) { nameBytes = -1; }
+    if (nameBytes < 0) { showIdleNote(MSG.nameFail, true); return; }
+    if (nameBytes > NAME_MAX) { showIdleNote(MSG.nameTooLong, true); return; }
+    if (extBanned(name)) { showIdleNote(KNOWN.banned_extension, true); return; }
+    var subtle = window.crypto && window.crypto.subtle;
+    if (!subtle || typeof subtle.digest !== 'function') { showIdleNote(MSG.noSubtle, true); return; }
+
+    current = { file: file, fileName: name, fileSize: file.size, sha: '',
+                shareId: '', ownerSecret: '', path: '', expiresAt: 0 };
+    cancelled = false;
+    fileNameEl.textContent = name;
+    fileMetaEl.textContent = fmtBytes(file.size);
+    setProgress(0);
+    setStage('busy');
+    setStatus(file.size > UPLOAD_MAX / 2
+      ? '正在计算文件校验值…（大文件可能需要十几秒）'
+      : '正在计算文件校验值…', false);
+    file.arrayBuffer().then(function (buf) {
+      if (cancelled) return null;
+      return subtle.digest('SHA-256', buf).then(function (dig) {
+        if (cancelled) return;
+        current.sha = bytesToHex(new Uint8Array(dig));
+        startRegister();
+      });
+    }).catch(function () {
+      if (cancelled) return;
+      current = null;
+      showError(MSG.readFail, false);
+    });
+  }
+
+  // ---- ③ 登记：POST /v1/anon/shares，裸 JSON 恰三键，无鉴权（会话前请求形态）。
+  // 201 恰六键 {share_id, token, owner_secret, path, expires_at, egress_budget}：
+  // 本页消费五键；token 不单独使用（已编码进 path）、egress_budget 不展示。----
+  function startRegister() {
+    setStatus('正在登记…', false);
+    fetch(BASE + '/v1/anon/shares', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_name: current.fileName, file_size: current.fileSize, sha256: current.sha })
+    }).then(function (res) {
+      readJson(res).then(function (env) {
+        if (cancelled) return;
+        if (!res.ok) { current = null; showError(messageFor(env), false); return; }
+        if (!env || typeof env.share_id !== 'string' || typeof env.owner_secret !== 'string'
+            || typeof env.path !== 'string' || typeof env.expires_at !== 'number') {
+          current = null;
+          showError(MSG.fallback, false);
+          return;
+        }
+        current.shareId = env.share_id;
+        current.ownerSecret = env.owner_secret;
+        current.path = env.path;
+        current.expiresAt = env.expires_at;
+        startPut();
+      });
+    }, function () {
+      if (cancelled) return;
+      current = null;
+      showError(MSG.connect, false);
+    });
+  }
+
+  // ---- ④ 传字节：裸 XHR PUT（api() 形态会把 body 强转 JSON，字节流只能直连）。
+  // 失败可重试面=断线/422/400 size_mismatch/5xx（重试先查态再整文件重传）；
+  // 确定性失败不给重试（重 PUT 必然再败且空烧 PUT 桶）。----
+  var NON_RETRYABLE = ['rate_limited', 'file_too_large', 'owner_invalid',
+    'unknown_share', 'length_required', 'bad_request', 'banned_extension'];
+
+  function startPut() {
+    setProgress(0);
+    setStatus('准备上传…', false);
+    var xhr = new XMLHttpRequest();
+    busyXhr = xhr;
+    xhr.open('PUT', BASE + '/v1/anon/shares/' + encodeURIComponent(current.shareId) + '/payload');
+    xhr.setRequestHeader('X-Kodeoff-Owner-Secret', current.ownerSecret);
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+    var lastNote = '';
+    xhr.upload.onprogress = function (ev) {
+      if (cancelled || !ev || !ev.lengthComputable || !ev.total) return;
+      var pct = (ev.loaded / ev.total) * 100;
+      setProgress(pct);
+      var note = '正在上传 ' + Math.floor(pct) + '%（' + fmtBytes(ev.loaded) + ' / ' + fmtBytes(ev.total) + '）…';
+      if (note !== lastNote) { lastNote = note; setStatus(note, false); }
+    };
+    xhr.onload = function () {
+      busyXhr = null;
+      if (cancelled) return;
+      if (xhr.status >= 200 && xhr.status < 300) { finishShare(); return; }
+      var env = parseJsonText(xhr.responseText, xhr.getResponseHeader('Content-Type'));
+      var code = env && typeof env.error === 'string' ? env.error : '';
+      var retryable = NON_RETRYABLE.indexOf(code) === -1; // 未知码/无信封默认可重试
+      showError(messageFor(env), retryable);
+    };
+    xhr.onerror = function () {
+      busyXhr = null;
+      if (cancelled) return;
+      showError(MSG.connect, true); // 服务端已清 .part，行留 pending（约 1 小时后清扫）
+    };
+    xhr.onabort = function () { busyXhr = null; }; // 取消收尾在 cancelUpload
+    xhr.send(current.file);
+  }
+
+  // ---- 取消：abort 在传请求 + 凭 owner_secret DELETE 登记行（即刻回收池字节
+  // 预占与每 IP 在途计数）。失败/断网不阻塞——pending 约 1 小时后服务端自动
+  // 清扫。如实边界：当小时 create/PUT 桶令牌不退还（页面披露行已注明）。----
+  function cancelUpload() {
+    cancelled = true;
+    if (busyXhr) { try { busyXhr.abort(); } catch (e) {} }
+    busyXhr = null;
+    var cur = current;
+    current = null;
+    stopCountdown();
+    setProgress(0);
+    setStage('idle');
+    if (!cur || !cur.shareId || !cur.ownerSecret) { showIdleNote('已取消。', false); return; }
+    fetch(BASE + '/v1/anon/shares/' + encodeURIComponent(cur.shareId), {
+      method: 'DELETE',
+      headers: { 'X-Kodeoff-Owner-Secret': cur.ownerSecret }
+    }).then(function (res) {
+      showIdleNote(res.ok ? '已取消上传。' : '已取消上传。未传完的部分将在约 1 小时后自动释放。', false);
+    }, function () {
+      showIdleNote('已取消上传。未传完的部分将在约 1 小时后自动释放。', false);
+    });
+  }
+
+  // ---- 重试：凭 owner_secret GET 状态 → ready 直接给链接；pending 重新 PUT
+  // 整个文件（登记信息与 File 都还在内存，不重算哈希）。401/404 无法在本页
+  // 恢复 → 只能重传。----
+  function retryUpload() {
+    var cur = current;
+    if (!cur || !cur.shareId || !cur.ownerSecret) return;
+    cancelled = false;
+    setProgress(0);
+    setStage('busy');
+    setStatus('正在查询上传状态…', false);
+    fetch(BASE + '/v1/anon/shares/' + encodeURIComponent(cur.shareId), {
+      headers: { 'X-Kodeoff-Owner-Secret': cur.ownerSecret }
+    }).then(function (res) {
+      readJson(res).then(function (env) {
+        if (cancelled) return;
+        if (res.ok && env && (env.status === 'ready' || env.status === 'pending')) {
+          if (env.status === 'ready') { finishShare(); return; }
+          startPut();
+          return;
+        }
+        current = null;
+        showError(messageFor(env), false);
+      });
+    }, function () {
+      if (cancelled) return;
+      showError(MSG.connect, true);
+    });
+  }
+
+  // ---- 复制三层兜底（照 copyAccountCode 先例）：clipboard API → execCommand
+  // 同步兜底 → 提示手动复制（user-select:all 保底点按全选恒可达）----
+  function legacyCopy(text) {
+    var ta = d.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    d.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = d.execCommand('copy'); } catch (e) { ok = false; }
+    d.body.removeChild(ta);
+    return ok;
+  }
+
+  var copyRevertTimer = null;
+  function copyShareLink() {
+    var url = linkEl.textContent;
+    if (!url) return;
+    var viaApi = (window.navigator && window.navigator.clipboard && window.navigator.clipboard.writeText)
+      ? window.navigator.clipboard.writeText(url).then(function () { return true; }, function () { return false; })
+      : Promise.resolve(false);
+    viaApi.then(function (ok) {
+      if (ok || legacyCopy(url)) {
+        copyBtn.textContent = '已复制';
+        if (copyRevertTimer) clearInterval(copyRevertTimer);
+        copyRevertTimer = setTimeout(function () { copyBtn.textContent = '复制链接'; }, 2000);
+        return;
+      }
+      copyNote.textContent = '自动复制失败，请点按链接全选后手动复制（⌘C/Ctrl+C）';
+      copyNote.hidden = false;
+    });
+  }
+
+  // ---- 事件绑定 ----
+  var dragDepth = 0;
+  dropEl.addEventListener('dragenter', function (e) { e.preventDefault(); dragDepth += 1; dropEl.classList.add('is-over'); });
+  dropEl.addEventListener('dragover', function (e) { e.preventDefault(); });
+  dropEl.addEventListener('dragleave', function () {
+    dragDepth -= 1;
+    if (dragDepth <= 0) { dragDepth = 0; dropEl.classList.remove('is-over'); }
+  });
+  dropEl.addEventListener('drop', function (e) {
+    e.preventDefault();
+    dragDepth = 0;
+    dropEl.classList.remove('is-over');
+    var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) startWithFile(file);
+  });
+  // 拖到页面其余位置不触发浏览器「打开文件」的默认行为
+  d.addEventListener('dragover', function (e) { e.preventDefault(); });
+  d.addEventListener('drop', function (e) { e.preventDefault(); });
+
+  dropEl.addEventListener('click', function () { inputEl.click(); });
+  dropEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); inputEl.click(); }
+  });
+  inputEl.addEventListener('change', function () {
+    var file = inputEl.files && inputEl.files[0];
+    inputEl.value = ''; // 复位：同一文件二次选择也能再次触发 change（app-login 先例）
+    if (file) startWithFile(file);
+  });
+  cancelBtn.addEventListener('click', cancelUpload);
+  copyBtn.addEventListener('click', copyShareLink);
+  againBtn.addEventListener('click', resetToIdle);
+  errorAgainBtn.addEventListener('click', resetToIdle);
+  retryBtn.addEventListener('click', retryUpload);
+
+  // service-config.js 是 defer 脚本：本内联脚本随 DOM 解析即执行，彼时它尚未
+  // 运行、KodeoffServiceConfiguration 还读不到（defer 脚本按文档序在解析完才
+  // 执行，先于 DOMContentLoaded）——初始化挂 DOMContentLoaded，保证 BASE 读到
+  // 注入值；脚本位于 body 末尾，彼时全部元素均已存在。
+  function init() {
+    var serviceConfiguration = window.KodeoffServiceConfiguration || {};
+    BASE = String(serviceConfiguration.baseURL || '').replace(/\/+$/, '');
+    if (!BASE) showIdleNote(MSG.noBase, true);
+    setStage('idle');
+  }
+  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
