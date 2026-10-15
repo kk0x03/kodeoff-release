@@ -9,7 +9,7 @@
 <meta property="og:title" content="Kodeoff：Mac 文件操作轮盘">
 <meta property="og:description" content="在 Finder 中拖住文件并停一下，选择打开、复制路径、编辑或分享，松手执行。适用于 macOS 13+。">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://kk0x03.github.io/kodeoff-release/">
+<meta property="og:url" content="https://www.kodeoff.com/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="stylesheet" href="./assets/style.css">
@@ -25,7 +25,7 @@
 <div class="demo-desktop"><div class="demo-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H5v20h14V7zM14 2v5h5m-10 5h6m-6 4h6"></path></svg><span>项目设计稿.md<small>示例文件</small></span></div>
 <div class="radial-demo"><div class="radial-stage"><div class="radial-wheel"><div class="radial-base"></div><div class="radial-hl"></div><div class="radial-hub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H5v20h14V7zM14 2v5h5m-10 5h6m-6 4h6"></path></svg></div><button class="radial-label" type="button" style="--a:0deg" data-index="0" data-detail="用 VS Code 打开文件或文件夹" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"></path></svg><span>VS Code</span></button>
 <button class="radial-label is-target" type="button" style="--a:36deg" data-index="1" data-detail="复制文件的完整路径" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg><span>复制路径</span></button>
-<button class="radial-label" type="button" style="--a:72deg" data-index="2" data-detail="经 iCloud 发往手机；此功能待真机验证" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M10 18h4"></path></svg><span>发手机</span></button>
+<button class="radial-label" type="button" style="--a:72deg" data-index="2" data-detail="经中继发往手机；需登录账号" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M10 18h4"></path></svg><span>发手机</span></button>
 <button class="radial-label" type="button" style="--a:108deg" data-index="3" data-detail="通过系统隔空投送分享文件" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg><span>AirDrop</span></button>
 <button class="radial-label" type="button" style="--a:144deg" data-index="4" data-detail="从支持该类型的 App 中选择" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><span>打开方式</span></button>
 <button class="radial-label" type="button" style="--a:180deg" data-index="5" data-detail="直接编辑文本，⌘S 保存" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14z"></path></svg><span>快捷编辑</span></button>
@@ -36,7 +36,7 @@
 <div class="demo-status" aria-live="polite"><span class="demo-status-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg></span><span class="demo-status-text">复制文件的完整路径</span></div></div>
 <div class="demo-footer"><span><span class="status-dot"></span> 轮盘预览</span><span>选择一个动作查看说明</span></div>
 </div>
-<p class="demo-disclaimer">界面预览，不读取或修改文件。上方按钮仅切换本页的预览外观；App 内的主题切换将在下一版本提供。</p>
+<p class="demo-disclaimer">界面预览，不读取或修改文件。上方按钮仅切换本页的预览外观；App 内主题切换见 设置 → 轮盘自定义。</p>
 </div>
 </div></div></section>
 
@@ -56,22 +56,21 @@
 <tbody>
 <tr><td>VS Code 打开</td><td>未安装 VS Code 时置灰</td></tr>
 <tr><td>复制路径</td><td>默认 POSIX，设置里可切 <code>file://</code> URI / 带引号</td></tr>
-<tr><td>发送到手机</td><td>拖住单个文件松手，经你的 iCloud 私有库发往手机端 Kodeoff（两端登录同一 Apple ID 即收）；多选、文件夹、未登录 iCloud，或所用版本未包含 iCloud 权限时置灰。此通道未经真机验证，详见「文件分享」一节。</td></tr>
-<tr><td>AirDrop</td><td>系统隔空投送，多选可用；iCloud 不可用或空间不足时的备选方式</td></tr>
+<tr><td>发送到手机</td><td>拖住单个文件松手，经你登录的中继服务（官方 relay.kodeoff.com 或自建）发往手机/网页端收件箱；文件夹自动压缩为 zip 后发送（扇区显示「压缩 &amp; 发送到手机」）；多选、未配置或未登录中继时置灰。详见「文件分享」一节。</td></tr>
+<tr><td>AirDrop</td><td>系统隔空投送，多选可用；中继不可用、文件过大或纯近场场景的备选方式</td></tr>
 <tr><td>打开方式…</td><td>二级环列出所有声明支持该类型的 App（点选）</td></tr>
 <tr><td>快捷编辑</td><td>文本文件进入内联迷你编辑器（⌘S 保存）；非文本 / 文件夹则重命名</td></tr>
 <tr><td>新建同格式</td><td>文件在父目录新建同扩展名空文件；文件夹新建同级空文件夹（自动编号）</td></tr>
 <tr><td>Finder 中显示</td><td>定位选中</td></tr>
 <tr><td>终端打开</td><td>文件夹直接打开，文件打开其所在目录</td></tr>
-<tr><td>设置</td><td>触发停顿时长、路径格式、扇区开关、开机自启</td></tr>
+<tr><td>设置</td><td>停顿时长与半径、路径格式、轮盘自定义（拖放替换）、开机自启</td></tr>
 </tbody>
 </table>
 </div></details>
 </section>
-<section class="section sharing" id="phone"><div class="section-head"><h2>文件分享</h2><p>发送文件有三条通道，进度不同：AirDrop 现已可用，其余见下方说明。</p></div><div class="channel-list">
-<article><div><h3>AirDrop</h3><span class="availability">可用</span></div><p>通过系统隔空投送发到附近设备，支持多个文件。</p></article>
-<article><div><h3>iCloud</h3><span class="availability pending">待验证</span></div><p>将通过你的 iCloud 私有库把文件同步到手机。iOS 收件 App 已开发完成、尚未发布，整条通道未经真机验证，当前预览包也不含此功能。</p></article>
-<article><div><h3>自托管中转</h3><span class="availability pending">待验证</span></div><p>在自己搭建的服务器上收发文件，macOS 与 iOS 端均已接入。收发链路仅在开发者本机测试通过；未做公网部署与长期运行验证，跨网使用需自行配置 TLS。</p></article>
+<section class="section sharing" id="phone"><div class="section-head"><h2>文件分享</h2><p>发送文件有两条通道：中继收发与 AirDrop。</p></div><div class="channel-list">
+<article><div><h3>中继收发</h3><span class="availability">可用</span></div><p>经官方服务 relay.kodeoff.com 或自建中继，把文件发往手机/网页端收件箱，需登录中继账号；文件夹自动压缩为 zip 后发送。iOS 商店与 TestFlight 构建内置官方服务，邀请码注册。收发链路已本地三端实测；公网长期运行验证仍在进行，跨网使用需自行配置 TLS。</p></article>
+<article><div><h3>AirDrop</h3><span class="availability">可用</span></div><p>通过系统隔空投送发到附近设备，支持多个文件；适合中继不可用、文件过大或纯近场的场景。</p></article>
 </div></section>
 <section class="section privacy" id="security"><div><h2>隐私与权限</h2><p class="section-description">复制路径、编辑和新建文件等本地操作不联网，也不需要辅助功能权限。</p></div><div class="privacy-copy"><article><h3>端到端加密尚未上线</h3><p>加密信封已实现、通道接入进行中。当前中继传输尚未使用该信封，服务器可访问其存储的文件与元数据；跨网络使用需要 HTTPS。</p></article><details class="technical-details"><summary>查看各通道的加密与存储说明 <span aria-hidden="true">＋</span></summary><div class="table-wrap">
 <table>
@@ -80,14 +79,14 @@
 </thead>
 <tbody>
 <tr>
-<td>iCloud 私有库（CloudKit）</td>
+<td>iCloud 私有库（CloudKit）——v0.1.5 起已退役（仅历史版本包含，当前构建不含此通道）</td>
 <td>框架级 TLS（Apple 保证）</td>
 <td>服务器端加密、Apple 持钥；若你开启 iCloud 高级数据保护（ADP），加密字段与资产升级端到端（应用元数据不在其端到端范围）</td>
 <td>否（保守说法：iCloud 体系内可见）</td>
 <td>iCloud 体系（含 Apple，依你的 iCloud 安全设置而不同）；开发者无服务器、不经手文件</td>
 </tr>
 <tr>
-<td>自托管账号中转</td>
+<td>自建中继</td>
 <td>默认仅本机回环明文 HTTP；服务端可选内置 TLS（--tls-cert/--tls-key，适用于单机 / 内网）；跨网生产推荐反向代理终止 TLS</td>
 <td>服务器明文落盘（文件与元数据）；设备凭据只存哈希</td>
 <td>否——相对 CloudKit 的明确隐私退步</td>
@@ -103,14 +102,15 @@
 </tbody>
 </table>
 </div><div class="security-note"><strong>端到端加密尚未接入任何通道。</strong><p>通道接入与验证完成前，不宣称「仅你可读」。</p></div></details></div></section>
-<section class="section platforms" id="platform"><div class="section-head"><h2>支持的平台</h2></div><div class="platform-list"><article><h3>macOS 13+</h3><p>集成 Finder、终端与 AirDrop。预览包使用 ad-hoc 签名，尚未完成 Developer ID 签名和公证；首次打开请右键→「打开」。</p></article><article><h3>Windows 10+（x64）</h3><p>实验性构建版，提供五个常用动作。尚未经 Windows 真机验证，不包含 AirDrop 与 iCloud 功能；首次运行 SmartScreen 请选「仍要运行」。</p></article></div></section>
-<section class="section release" id="download"><h2>下载 Kodeoff</h2><p>v0.1.5 公开预览版，提供 macOS 与 Windows 安装包。</p><div class="hero-cta"><a class="btn btn-primary" href="https://github.com/kk0x03/kodeoff-release/releases/download/v0.1.5/Kodeoff-0.1.5-macOS.dmg">下载 macOS 版</a><a class="btn btn-secondary" href="https://github.com/kk0x03/kodeoff-release/releases/download/v0.1.5/Kodeoff-0.1.5-windows-x64-native.zip">下载 Windows 版</a></div><p class="download-help">macOS 首次打开请右键→「打开」；Windows 首次运行 SmartScreen 请选「仍要运行」，详见<a href="#platform">支持的平台</a>一节。</p></section>
+<section class="section platforms" id="platform"><div class="section-head"><h2>支持的平台</h2></div><div class="platform-list"><article><h3>macOS 13+</h3><p>集成 Finder、终端与 AirDrop。预览包使用 ad-hoc 签名，尚未完成 Developer ID 签名和公证；首次打开请右键→「打开」。</p></article><article><h3>Windows 10+（x64）</h3><p>实验性构建版，提供五个常用动作，拖动停顿或长按（约 0.6 秒）均可呼出轮盘。尚未经 Windows 真机验证，不包含登录收发与 AirDrop/iCloud 等网络、近场功能；首次运行 SmartScreen 请选「仍要运行」。</p></article></div></section>
+<section class="section release" id="download"><h2>下载 Kodeoff</h2><p class="download-lede">v0.1.5 公开预览版，提供 macOS 安装包与 Windows 绿色版压缩包。</p><div class="hero-cta"><a class="btn btn-primary" href="https://github.com/kk0x03/kodeoff-release/releases/download/v0.1.5/Kodeoff-0.1.5-macOS.dmg">下载 macOS 版</a><a class="btn btn-secondary" href="https://github.com/kk0x03/kodeoff-release/releases/download/v0.1.5/Kodeoff-0.1.5-windows-x64-native.zip">下载 Windows 版</a></div><p class="download-help">macOS 首次打开请右键→「打开」；Windows 首次运行 SmartScreen 请选「仍要运行」，详见<a href="#platform">支持的平台</a>一节。安装包校验和见 Release 页 <a href="https://github.com/kk0x03/kodeoff-release/releases/download/v0.1.5/SHA256SUMS" target="_blank" rel="noopener">SHA256SUMS</a>。</p></section>
+<script src="./assets/download-detect.js" defer></script>
 <section class="section faq" id="faq"><div class="section-head"><h2>常见问题</h2></div><div class="faq-list">
 <details><summary>需要什么权限？ <span aria-hidden="true">＋</span></summary><p>不需要辅助功能权限。文件访问遵循 macOS 的权限设置。</p></details>
-<details><summary>如何调整轮盘？ <span aria-hidden="true">＋</span></summary><p>在设置中调整触发停顿时长、停顿半径及轮盘动作。浅色 / 深色 / 玻璃外观切换，以及可选的 Finder 长按与直接右键入口，将在下一版本加入；其中 Finder 长按与右键入口需要辅助功能权限，仍在真机验证。上述新功能均不在当前 v0.1.5 下载包中。</p></details>
+<details><summary>如何调整轮盘？ <span aria-hidden="true">＋</span></summary><p>在设置中调整触发停顿时长、停顿半径；设置 → 轮盘自定义 可切换毛玻璃/浅色/深色并拖放动作。v0.1.5 还包含可选的 Finder 长按入口（设置 → 操作习惯，默认关闭，需辅助功能权限，尚未经真机全面验证）；直接右键入口将在下一版本加入。</p></details>
 <details><summary>如何取消操作？ <span aria-hidden="true">＋</span></summary><p>拖拽时可在轮盘中心松手、拖出轮盘边界，或按 Esc 取消 Finder 拖拽。通过右键「服务」打开的轮盘需点击外部或中心关闭，不支持 Esc。</p></details>
 <details><summary>授权与开源说明 <span aria-hidden="true">＋</span></summary><p>代码不开源。授权与收费方案尚未公布。</p></details>
 </div></section>
 </main>
-<footer><a class="brand" href="#top"><img src="./favicon.svg" width="28" height="28" alt="">Kodeoff</a><span>v0.1.5 预览版</span><div class="footer-links"><a href="./app.html">网页版</a><a href="./docs.html">使用说明</a><a href="./privacy.html">隐私</a><a href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener">版本记录</a><a href="https://github.com/kk0x03/kodeoff-release/issues" target="_blank" rel="noopener">反馈问题</a></div></footer>
+<footer><a class="brand" href="#top"><img src="./favicon.svg" width="28" height="28" alt="">Kodeoff</a><span class="footer-version">v0.1.5 预览版</span><div class="footer-links"><a href="./app.html">网页版</a><a href="./docs.html">使用说明</a><a href="./privacy.html">隐私</a><a href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener">版本记录</a><a href="https://github.com/kk0x03/kodeoff-release/issues" target="_blank" rel="noopener">反馈问题</a></div></footer>
 </body></html>

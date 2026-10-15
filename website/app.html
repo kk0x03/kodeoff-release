@@ -30,8 +30,8 @@
 <form id="login-form" novalidate>
 <div id="server-settings" hidden><div class="field">
 <label for="relay-base">服务器地址</label>
-<input id="relay-base" type="text" inputmode="url" spellcheck="false" autocomplete="off" placeholder="http://127.0.0.1:8765">
-<p id="relay-warn" class="note-warn" hidden>该地址不是本机回环，HTTPS 页面的浏览器会拦截对它的明文请求；远程 relay 需自行配置 TLS（服务端已有 --tls-cert 内置支持）。</p>
+<input id="relay-base" type="text" inputmode="url" spellcheck="false" autocomplete="off" placeholder="http://127.0.0.1:18765">
+<p id="relay-warn" class="note-warn" hidden>该地址不是本机回环，HTTPS 页面的浏览器会拦截对它的明文请求；远程服务器需自行配置 TLS（服务端已有 --tls-cert 内置支持）。</p>
 </div>
 </div>
 <div id="tab-row" class="tab-group" role="tablist" aria-label="登录方式">
@@ -57,7 +57,7 @@
 <label for="login-code">账号码</label>
 <input id="login-code" type="text" autocomplete="off" spellcheck="false" placeholder="KOD-XXXXX-XXXXX">
 </div>
-<p class="muted field-hint">账号码可在 Mac 端 Kodeoff 设置的中转账号页查看。</p>
+<p class="muted field-hint">账号码可在 Mac 端 Kodeoff 设置 → 中继账号页查看。</p>
 </div>
 <p id="email-closed-note" class="note-warn" hidden>此服务器未启用邮箱登录</p>
 <button id="login-submit" type="submit" class="btn btn-primary btn-block">登录</button>
@@ -87,7 +87,7 @@ textContent 渲染（XSS 纪律，app-login.js 头注），本块不含任何服
 <div id="register-step2" hidden>
 <p id="reg-sent-note" class="register-sent"></p>
 <div class="field">
-<label for="reg-password">设置密码（至少 8 字节）</label>
+<label for="reg-password">设置密码（至少 8 个字符）</label>
 <input id="reg-password" type="password" autocomplete="new-password">
 </div>
 <div class="field">
@@ -174,7 +174,7 @@ textContent 渲染。user-select:all 保底点按全选恒可达，本行只在�
 <div id="forgot-step2" hidden>
 <p id="forgot-sent-note" class="register-sent"></p>
 <div class="field">
-<label for="forgot-password">新密码（至少 8 字节）</label>
+<label for="forgot-password">新密码（至少 8 个字符）</label>
 <input id="forgot-password" type="password" autocomplete="new-password">
 </div>
 <div class="field">
