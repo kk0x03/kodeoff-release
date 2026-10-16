@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var d = typeof document !== 'undefined' ? document : null;
-  var FALLBACK_VERSION = '0.1.6';
+  var FALLBACK_VERSION = '0.1.7';
   var DETECT_TEXT = { macos: '已检测到 macOS：推荐下载 macOS 版', windows: '已检测到 Windows：推荐下载 Windows 版' };
 
   function detectOS(ua, touch) {

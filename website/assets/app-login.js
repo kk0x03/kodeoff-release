@@ -1,6 +1,6 @@
 /* Kodeoff 网页客户端：登录（邮箱/账号码三态自适应）+ 注册（invite 邀请制，仅
- * invite 模式出现）+ 收件箱（文件下载、剪贴板文本查看/复制/删除）+ 登出（吊销
- * 本浏览器设备）。
+ * invite 模式出现）+ 收件箱（文件下载、剪贴板文本查看/复制/删除、剪贴板图片
+ * 缩略/下载）+ 登出（吊销本浏览器设备）。
  *
  * 纪律（红线，逐条有理由）：
  * - 零依赖纯静态：无框架无构建，浏览器直连用户自部署 relay（HTTPS 页 →
@@ -9,8 +9,10 @@
  *   字符串一律 Node.textContent / document.createElement 渲染，绝不调用任何
  *   把字符串当 HTML 解析或当作代码执行的接口（API 名不在此复述——本文件是
  *   机器 grep『零命中』断言的对象，注释里出现原词即破防）——剪贴板文本是
- *   任意内容的注入载体，不进 HTML 解析器即无注入面。a.download=file_name 是
- *   属性赋值非 HTML 解析，安全。URL 拼接一律 encodeURIComponent(record_name)。
+ *   任意内容的注入载体，不进 HTML 解析器即无注入面。a.download=file_name 与
+ *   img.src=blob:对象URL（剪贴板图片缩略——URL 由本页 fetchBlob 对 payload
+ *   生成，非服务端可控串）都是属性赋值非 HTML 解析，安全。URL 拼接一律
+ *   encodeURIComponent(record_name)。
  * - 4xx 一律不自动重试：服务端 login_guard 是全服持久熔断（20 次失败/600s），
  *   自动重试会烧全服登录名额殃及 native 端；401 分支只清凭据回登录页，不重试。
  * - 网页注册入口仅在 invite 模式出现，并按 emailClosed 分两腿：邮箱启用走既有
@@ -39,6 +41,12 @@
   var RELAY_KEY = 'kodeoff.web.relay';     // 非敏感偏好：服务器地址
   var SESSION_KEY = 'kodeoff.web.session'; // {device_token,device_id,account_code,base}
   var CLIPBOARD_UTI = 'public.utf8-plain-text';
+  // 剪贴板图片记录 UTI 约定（mac 截图自动同步「当前剪贴板」的 PNG）。勘察
+  // overwritePlan §5 拍板：不复用 public.png——网页上传的 png 与 mac 手动发
+  // 截图都已是 public.png，复用则无法区分自动/手动，会把手动发送误染成剪贴板
+  // 卡。与 native 端 ClipboardImageDelivery.uti（apps/ios）逐字同串，服务端
+  // 对 uti 无白名单照收。红线同 CLIPBOARD_UTI：UPLOAD_UTI 永不包含本常量。
+  var CLIPBOARD_IMAGE_UTI = 'com.kodeoff.clipboard-image';
   var DEVICE_NAME = 'Web Browser';         // 1-128 UTF-8 字节（服务端硬限），固定值
   var serviceConfiguration = window.KodeoffServiceConfiguration || {};
   var DEFAULT_BASE = serviceConfiguration.baseURL || '';
@@ -50,9 +58,11 @@
   var UPLOAD_MAX = 100 * 1024 * 1024;      // 网页上传上限：sha256 需把文件整读进 JS 堆算（内存依据见上传段注释）
   var SOURCE_VERSION = 'web-1.0.0';        // 上传登记的 source_version（服务端 1..256 字节非空）
   // 上传登记的扩展名 → UTI 映射（iPhone 收件箱按 uti 分流：图片/视频/其余全落
-  // 「文件」栏）。红线：本表永不包含剪贴板文本 UTI（CLIPBOARD_UTI 常量）——
-  // .txt 钉死 public.plain-text；若把文件误归成 CLIPBOARD_UTI，收件箱会整卡按
-  // 剪贴板文本渲染（buildCard 按 uti 分流），文件打不开。未命中/无扩展名 →
+  // 「文件」栏）。红线：本表永不包含两个剪贴板 UTI 常量（CLIPBOARD_UTI 文本 /
+  // CLIPBOARD_IMAGE_UTI 图片）——.txt 钉死 public.plain-text、.png 钉死
+  // public.png；若把上传文件误归成剪贴板常量，收件箱会整卡按剪贴板渲染
+  // （buildCard 按 uti 分流），网页上传的图片会被当成 mac 自动同步的「当前
+  // 剪贴板」。未命中/无扩展名 →
   // public.data（native 同款回退：DeliveryUploadQueue declared typeIdentifier
   // ?? 按扩展名 ?? public.data）。值全部取 iOS UTType 注册表可解析串。
   var UPLOAD_UTI = {
@@ -1681,19 +1691,53 @@
     return b;
   }
 
+  // ---- 剪贴板图片卡：缩略图（mac 截图自动同步「当前剪贴板」）----
+  // payload 端点要 Authorization 头，img 无法直链服务端 URL——经 fetchBlob 整体
+  // 载入（与文本卡「查看」同一代价；该类记录按 mac 侧「覆盖删除旧同步」语义
+  // 每设备至多一条在册，自动缩略总量有界）→ blob 转 objectURL 赋 img.src（属性
+  // 赋值，无 HTML 解析，XSS 红线）。state.blob 同时被缓存：卡内「下载」复用
+  // 同一 blob（downloadRow 再做 SHA-256 校验后保存），不二次拉取。
+  // >32MB（与 VERIFY_MAX 同尺）不自动拉缩略——内存护栏与校验跳过阈值同一把
+  // 尺，超大图走「下载」自担（downloadRow 的 >64MB confirm 照常把关）。
+  function loadThumb(row, state, img, imgNote) {
+    var owner = session;
+    if (!owner) return;
+    if (typeof row.file_size === 'number' && row.file_size > VERIFY_MAX) {
+      imgNote.textContent = '图片较大（' + fmtBytes(row.file_size) + '），未自动加载缩略图；点「下载」查看';
+      imgNote.hidden = false;
+      return;
+    }
+    fetchBlob(row, state).then(function (got) {
+      if (got === null || session !== owner) return; // 401 已接管
+      img.onload = function () { img.hidden = false; };
+      img.onerror = function () {
+        img.hidden = true;
+        imgNote.textContent = '图片无法显示（内容可能不是有效图片）；点「下载」保存后查看';
+        imgNote.hidden = false;
+      };
+      img.src = URL.createObjectURL(got.blob);
+    }).catch(function (err) {
+      if (session !== owner) return;
+      imgNote.textContent = (err && err.message) ? err.message : MSG.connect;
+      imgNote.hidden = false;
+    });
+  }
+
   function buildCard(row) {
-    // 按 uti 分流而非 Content-Type（payload 响应恒 application/octet-stream）
+    // 按 uti 分流而非 Content-Type（payload 响应恒 application/octet-stream）：
+    // 剪贴板文本 / 剪贴板图片（自动同步）/ 其余文件三面
     var isText = row.uti === CLIPBOARD_UTI;
+    var isClipImg = row.uti === CLIPBOARD_IMAGE_UTI;
     var card = d.createElement('article');
     card.className = 'item-card';
 
     var head = d.createElement('div');
     head.className = 'item-head';
     var titleWrap = d.createElement('div');
-    if (isText) {
+    if (isText || isClipImg) {
       var kind = d.createElement('span');
       kind.className = 'item-kind';
-      kind.textContent = '剪贴板文本';
+      kind.textContent = isText ? '剪贴板文本' : '剪贴板图片';
       titleWrap.appendChild(kind);
     }
     var title = d.createElement('p');
@@ -1710,7 +1754,7 @@
 
     // 卡内闭包状态：payload blob 与全文文本只在首次取用时拉取并缓存（刷新即释放）
     var state = { blob: null, text: null, open: false, loading: false };
-    var pre = null, truncNote = null, viewBtn = null;
+    var pre = null, truncNote = null, viewBtn = null, img = null, imgNote = null;
 
     if (isText) {
       pre = d.createElement('pre');
@@ -1724,6 +1768,17 @@
       actions.appendChild(viewBtn);
       actions.appendChild(mkBtn('复制', function () { copyText(row, state, pre, truncNote, viewBtn); }));
       actions.appendChild(mkBtn('下载', function () { downloadRow(row, state, true); }));
+    } else if (isClipImg) {
+      // 图片卡 = 角标 + 缩略图 + 下载/删除；缩略 hidden 起步，解码成功才露出
+      img = d.createElement('img');
+      img.className = 'img-thumb';
+      img.alt = row.file_name || '剪贴板图片'; // 属性赋值，服务端可控串不进 HTML 解析
+      img.decoding = 'async';
+      img.hidden = true;
+      imgNote = d.createElement('p');
+      imgNote.className = 'img-note';
+      imgNote.hidden = true;
+      actions.appendChild(mkBtn('下载', function () { downloadRow(row, state, true); }));
     } else {
       actions.appendChild(mkBtn('下载', function () { downloadRow(row, state, false); }));
     }
@@ -1733,6 +1788,7 @@
     head.appendChild(actions);
     card.appendChild(head);
     if (isText) { card.appendChild(pre); card.appendChild(truncNote); }
+    if (isClipImg) { card.appendChild(img); card.appendChild(imgNote); loadThumb(row, state, img, imgNote); }
     return card;
   }
 

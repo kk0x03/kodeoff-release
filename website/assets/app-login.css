@@ -84,6 +84,13 @@
 .text-view{background:var(--panel);border-radius:12px;padding:14px;margin:12px 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;color:var(--text)}
 .text-trunc{font-size:11px;color:var(--muted);margin:8px 0 0}
 
+/* 剪贴板图片卡（mac 截图自动同步）：缩略图卡宽自适应、限高 contain 保比例；
+   [hidden] 显式声明——作者样式表的 display 会压过 UA 的 [hidden]{display:none}，
+   不补这条则 JS 置 hidden 的元素仍然可见 */
+.img-thumb{display:block;width:100%;max-height:280px;object-fit:contain;border-radius:12px;margin:12px 0 0;background:var(--panel)}
+.img-thumb[hidden]{display:none}
+.img-note{font-size:11px;color:var(--muted);margin:8px 0 0}
+
 @media(max-width:600px){
 .app-main{padding:28px 20px 56px}
 .login-card{padding:24px 20px}
