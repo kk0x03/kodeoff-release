@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var d = typeof document !== 'undefined' ? document : null;
-  var FALLBACK_VERSION = '0.1.7';
+  var FALLBACK_VERSION = '0.1.8';
   var DETECT_TEXT = { macos: '已检测到 macOS：推荐下载 macOS 版', windows: '已检测到 Windows：推荐下载 Windows 版' };
 
   function detectOS(ua, touch) {
@@ -43,7 +43,7 @@
     if (!d) return;
     var lede = d.querySelector('#download .download-lede');
     var mac = d.querySelector('#download a[href*="-macOS.dmg"]');
-    var win = d.querySelector('#download a[href*="windows-x64-native"]');
+    var win = d.querySelector('#download a[href*="windows-x64"]');
     var target = os === 'macos' ? mac : os === 'windows' ? win : null;
     var other = os === 'macos' ? win : mac;
     if (!target || !other) return;
