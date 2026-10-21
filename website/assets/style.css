@@ -66,20 +66,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .section-head{margin-bottom:38px}
 h2{font-size:clamp(30px,3.2vw,44px);line-height:1.35;letter-spacing:-1.5px;font-weight:600;margin-bottom:18px}
 .section-head>p:last-child{font-size:14px;color:var(--muted)}
-.feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
-.feature-card{background:var(--panel);border:1px solid var(--line);padding:28px;border-radius:var(--radius);min-width:0;overflow:hidden}
 h3{font-size:21px;letter-spacing:-.5px;font-weight:600;margin-bottom:10px}
-.feature-card p{color:var(--muted);font-size:13px}
-.feature-art{margin-top:36px;min-height:90px}
-.app-art{display:flex;gap:10px;align-items:center;justify-content:center}
-.app-art span{display:grid;place-items:center;width:64px;height:64px;background:var(--soft);color:var(--accent);border-radius:16px;font-size:23px}
-.app-art span:nth-child(2){font-size:10px;transform:translateY(-10px)}
-.path-art{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;border:1px solid var(--line);padding:16px;border-radius:12px;background:var(--bg)}
-.path-art span{color:var(--accent)}
-.edit-art{background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.edit-art>span{display:flex;justify-content:space-between;padding:6px 12px;font-size:10px;color:var(--muted);border-bottom:1px solid var(--line)}
-.edit-art code{display:block;padding:14px 12px;font-size:12px}
-.edit-art code span{color:var(--accent)}
 .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px}
 .steps b{font-size:38px;color:var(--accent);font-weight:400;display:block;margin-bottom:18px}
 .steps p{font-size:13px;color:var(--muted)}
@@ -110,7 +97,10 @@ footer .brand{font-size:20px;color:var(--text)}
 .radial-base{border-color:var(--line);background:repeating-conic-gradient(from -18deg,transparent 0 35.6deg,var(--line) 35.6deg 36deg),var(--panel)}
 .radial-base::after{border-color:var(--line)}
 .radial-wheel{filter:drop-shadow(0 14px 22px #14243b18)}
-.radial-hl{background:conic-gradient(from -18deg,var(--accent) 0 36deg,transparent 36deg)}
+/* 选中扇区三主题（glass/light/dark）统一规则：accent（或主题变量 --hl-fill）填充，
+   两侧 1.1° 白色发丝描边与邻区硬分离——玻璃暗色由 .brand-dark 覆写 --hl-fill，
+   其余主题共用本定义（2026-10-21 提升自 glass 专属规则，修复非 glass 档对比不足）。 */
+.radial-hl{background:conic-gradient(from -18deg,rgba(255,255,255,.95) 0 1.1deg,transparent 1.1deg 34.9deg,rgba(255,255,255,.95) 34.9deg 36deg),conic-gradient(from -18deg,var(--hl-fill,var(--accent)) 0 36deg,transparent 36deg)}
 .radial-hub{background:var(--panel);border-color:var(--line);box-shadow:0 0 0 5px var(--soft)}
 .radial-hub svg{color:var(--accent)}
 .radial-label{color:var(--muted);font-size:10px}
@@ -137,7 +127,6 @@ footer .brand{font-size:20px;color:var(--text)}
 .native .demo-status{position:absolute;right:20px;top:44%;max-width:145px;text-align:left;margin:0;padding:12px;font-size:10px}
 .native .demo-footer{padding:10px 18px}
 .native .section-head{text-align:center}
-.native .feature-card{box-shadow:0 10px 30px #25426504}
 .native .steps{text-align:center}
 .native .privacy h2{max-width:400px}
 .native .faq .section-head{text-align:left}
@@ -148,7 +137,7 @@ footer .brand{font-size:20px;color:var(--text)}
 footer{margin-left:40px;margin-right:40px}
 .release{margin-left:40px;margin-right:40px}
 .nav-links{gap:20px}
-.feature-card{padding:23px}}
+}
 @media(max-width:850px){:root{--wheel:300px}
 .nav{padding:0 24px;min-height:68px}
 .nav-links{gap:16px;font-size:12px}
@@ -157,18 +146,10 @@ footer{margin-left:40px;margin-right:40px}
 .hero h1{font-size:64px}
 .visual-wrap{width:100%;max-width:600px;margin:auto}
 .section{padding:66px 32px}
-.feature-grid{gap:12px}
-.feature-card{padding:20px}
-.feature-card h3{font-size:18px}
-.feature-card p{font-size:12px}
-.feature-art{min-height:85px}
-.app-art{gap:6px}
-.app-art span{width:42px;height:50px;font-size:18px}
-.path-art{padding:8px;font-size:9px}
 .privacy,.faq{gap:35px}
 .release{margin:0 32px}
 .native .hero-grid{padding-left:32px;padding-right:32px}
-.native .demo-status{right:12px;max-width:115px;font-size:9px}
+.native .demo-status{right:12px;max-width:115px;font-size:10px}
 .native .demo-file{left:3%;font-size:10px}
 .native .hero h1{font-size:64px}
 .native .hero-sub br{display:block}
@@ -189,25 +170,18 @@ footer{margin:0 32px}
 .hero-sub{font-size:14px;line-height:1.9;margin-bottom:24px}
 .btn{font-size:12px;padding:12px 17px;gap:16px}
 .hero-note{font-size:10px}
-.demo-toolbar{padding:0 12px;font-size:9px}
+.demo-toolbar{padding:0 12px;font-size:10px}
 .demo-desktop{padding-top:75px}
 .demo-file{font-size:10px;left:17px}
-.radial-label{font-size:10px;width:52px;height:46px;gap:4px}
+.radial-label{font-size:11px;width:52px;height:46px;gap:4px}
 .radial-label svg{width:17px;height:17px}
-.demo-footer{font-size:9px;padding:10px}
-.demo-disclaimer{font-size:10px}
+.demo-footer{font-size:10px;padding:10px}
+.demo-disclaimer{font-size:11px}
 .demo-status{font-size:10px;max-width:96%}
 .section{padding:55px 20px}
 .section-head{margin-bottom:28px}
 h2{font-size:31px;letter-spacing:-1px}
 .section-head>p:last-child{font-size:12px}
-.feature-grid{grid-template-columns:1fr;gap:16px}
-.feature-card{padding:25px}
-.feature-card h3{font-size:21px}
-.feature-art{margin-top:24px;min-height:80px}
-.app-art span{width:64px;height:60px}
-.app-art{gap:12px}
-.path-art{font-size:12px;padding:18px}
 .steps{grid-template-columns:1fr;gap:27px}
 .steps article{display:grid;grid-template-columns:48px 1fr;gap:0 15px;align-items:center;text-align:left}
 .steps b{grid-row:span 2;font-size:26px;margin:0}
@@ -230,7 +204,7 @@ footer>span{margin-left:auto}
 footer>a:last-child{width:100%}
 .native .hero-grid{padding:42px 20px 28px;gap:32px}
 .native .hero h1{font-size:44px;letter-spacing:-2px}
-.native .hero-sub{font-size:14px}
+.native .hero-sub{font-size:15px}
 .native .hero-sub br{display:block}
 .native .demo-desktop{padding-top:72px;padding-bottom:18px}
 .native .demo-file{position:absolute;top:18px;left:18px;max-width:none;flex-direction:row;align-items:center;text-align:left}
@@ -248,22 +222,22 @@ footer>a:last-child{width:100%}
 .radial-label{font-size:9px;width:47px}
 .radial-label svg{width:15px;height:15px}
 .btn{padding:11px 14px;gap:10px}
-.demo-footer>span:last-child{font-size:8px}
+
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 /* Final homepage: quieter surfaces and descriptive product copy. */
-.brand img{display:block;flex-shrink:0}.brand{letter-spacing:-.7px}.native .hero-grid{padding-top:56px;gap:32px}.native .hero h1{font-size:clamp(42px,4.8vw,64px);line-height:1.22;margin-bottom:24px}.native .hero-sub{font-size:16px;line-height:1.85}.native .hero-sub br{display:block}.native .hero-note{margin-top:15px}.native .demo-desktop{background:#f0f4fa}.demo-desktop::before{display:none}.demo-window{box-shadow:0 12px 40px #28456b0b}.demo-disclaimer{font-size:11px;margin-top:14px}.native .demo-file{font-size:10px}.native .demo-status{max-width:135px;box-shadow:none}.demo-status-icon{display:none}.btn{font-weight:500}.btn-primary:hover{background:#0e59cf}.btn-secondary{border-color:#dce1e9}.hero .btn-secondary{border:0;background:none;color:var(--accent)}.hero .btn-secondary:hover{text-decoration:underline}.section{padding-top:76px;padding-bottom:76px}.section-head h2{font-size:32px;font-weight:600;letter-spacing:-.7px}.feature-card{border-radius:16px;padding:26px;background:#f6f7f9;border:0}.native .feature-card{box-shadow:none}.feature-card h3{font-size:18px;letter-spacing:-.3px}.feature-card p{font-size:13px}.feature-art{min-height:78px;margin-top:28px}.app-art{gap:8px}.app-art span,.app-art span:nth-child(2){width:auto;min-width:65px;height:52px;padding:0 9px;font-size:11px;transform:none;background:white;border:1px solid var(--line);border-radius:10px;color:#4d5869}.path-art,.edit-art{background:white;border-color:var(--line);border-radius:9px}.path-art{font-size:10px;padding:13px}.usage{margin-top:46px;padding-top:30px;border-top:1px solid var(--line)}.usage>h3{font-size:17px;margin-bottom:24px}.native .steps{padding:0;margin:0;list-style:none;text-align:left;gap:25px}.steps li{display:flex;gap:13px;align-items:flex-start;min-width:0}.steps b{width:26px;height:26px;display:grid;place-items:center;flex-shrink:0;font-size:12px;line-height:1;background:#edf1f6;color:#606e82;border-radius:50%;margin:0}.steps h3{font-size:14px;margin:1px 0 5px;letter-spacing:0}.steps p{font-size:12px}.usage-note{font-size:12px;color:var(--muted);margin:24px 0 0;max-width:75em}.technical-details{margin-top:24px;border-bottom:1px solid var(--line)}.technical-details summary{font-size:13px;justify-content:space-between}.technical-details summary span{font-size:15px}.table-wrap{width:100%;overflow-x:auto;padding-bottom:20px;-webkit-overflow-scrolling:touch}.table-wrap table{width:100%;min-width:540px;border-collapse:collapse;font-size:12px;text-align:left;line-height:1.8}.table-wrap td,.table-wrap th{padding:12px;vertical-align:top;border-bottom:1px solid var(--line)}.table-wrap th{font-weight:500;background:#f5f7fa}.table-wrap td:first-child{min-width:120px;color:var(--text)}.table-wrap td{color:var(--muted)}.security-note{padding-bottom:18px;font-size:12px}.security-note strong{font-weight:500}.security-note p{padding:0;margin-top:7px;font-size:12px}.sharing{border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1.45fr;gap:70px}.native .sharing .section-head{text-align:left;max-width:360px}.channel-list article{display:grid;grid-template-columns:155px 1fr;gap:24px;padding:23px 0;border-bottom:1px solid var(--line)}.channel-list article:first-child{padding-top:0}.channel-list h3{font-size:16px;margin-bottom:5px}.channel-list p{font-size:13px;color:var(--muted);margin:0}.availability{font-size:10px;color:#366651}.availability.pending{color:var(--muted)}.section-description{font-size:14px;color:var(--muted);max-width:32em}.privacy{border-top:1px solid var(--line);gap:70px;grid-template-columns:1fr 1.45fr}.privacy h2{font-size:32px;letter-spacing:-.7px}.privacy-copy .technical-details{margin:0}.privacy-copy{min-width:0}.privacy-copy article{margin-bottom:20px}.platforms{padding-top:32px}.native .platforms .section-head{text-align:left;margin-bottom:28px}.platform-list{display:grid;grid-template-columns:1fr 1fr;gap:50px;border-top:1px solid var(--line);padding-top:25px}.platform-list h3{font-size:17px}.platform-list p{font-size:13px;color:var(--muted);max-width:38em}.release{background:#f2f5fa;border-radius:20px;padding:50px 30px}.release h2{font-size:34px}.release .download-help{font-size:11px;margin:20px 0 0}.download-help a{color:var(--accent);white-space:nowrap}.faq{grid-template-columns:1fr 1.45fr}.faq h2{font-size:32px}.faq-list summary{font-size:13px}.footer-links{display:flex;gap:24px}footer{font-size:11px}.muted{color:var(--muted)}
+.brand img{display:block;flex-shrink:0}.brand{letter-spacing:-.7px}.native .hero-grid{padding-top:56px;gap:32px}.native .hero h1{font-size:clamp(42px,4.8vw,64px);line-height:1.22;margin-bottom:24px}.native .hero-sub{font-size:16px;line-height:1.85}.native .hero-sub br{display:block}.native .hero-note{margin-top:15px}.native .demo-desktop{background:#f0f4fa}.demo-desktop::before{display:none}.demo-window{box-shadow:0 12px 40px #28456b0b}.demo-disclaimer{font-size:11px;margin-top:14px}.native .demo-file{font-size:10px}.native .demo-status{max-width:135px;box-shadow:none}.demo-status-icon{display:none}.btn{font-weight:500}.btn-primary:hover{background:#0e59cf}.btn-secondary{border-color:#dce1e9}.hero .btn-secondary{border:0;background:none;color:var(--accent)}.hero .btn-secondary:hover{text-decoration:underline}.section{padding-top:76px;padding-bottom:76px}.section-head h2{font-size:32px;font-weight:600;letter-spacing:-.7px}.usage{margin-top:46px;padding-top:30px;border-top:1px solid var(--line)}.usage>h3{font-size:17px;margin-bottom:24px}.native .steps{padding:0;margin:0;list-style:none;text-align:left;gap:25px}.steps li{display:flex;gap:13px;align-items:flex-start;min-width:0}.steps b{width:26px;height:26px;display:grid;place-items:center;flex-shrink:0;font-size:12px;line-height:1;background:#edf1f6;color:#606e82;border-radius:50%;margin:0}.steps h3{font-size:14px;margin:1px 0 5px;letter-spacing:0}.steps p{font-size:12px}.technical-details{margin-top:24px;border-bottom:1px solid var(--line)}.technical-details summary{font-size:13px;justify-content:space-between}.technical-details summary span{font-size:15px}.table-wrap{width:100%;overflow-x:auto;padding-bottom:20px;-webkit-overflow-scrolling:touch}.table-wrap table{width:100%;min-width:540px;border-collapse:collapse;font-size:12px;text-align:left;line-height:1.8}.table-wrap td,.table-wrap th{padding:12px;vertical-align:top;border-bottom:1px solid var(--line)}.table-wrap th{font-weight:500;background:#f5f7fa}.table-wrap td:first-child{min-width:120px;color:var(--text)}.table-wrap td{color:var(--muted)}.sharing{border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1.45fr;gap:70px}.native .sharing .section-head{text-align:left;max-width:360px}.section-description{font-size:14px;color:var(--muted);max-width:32em}.privacy{border-top:1px solid var(--line);gap:70px;grid-template-columns:1fr 1.45fr}.privacy h2{font-size:32px;letter-spacing:-.7px}.privacy-copy .technical-details{margin:0}.privacy-copy{min-width:0}.privacy-copy article{margin-bottom:20px}.platforms{padding-top:32px}.native .platforms .section-head{text-align:left;margin-bottom:28px}.platform-list{display:grid;grid-template-columns:1fr 1fr;gap:50px;border-top:1px solid var(--line);padding-top:25px}.platform-list h3{font-size:17px}.platform-list p{font-size:13px;color:var(--muted);max-width:38em}.release{background:#f2f5fa;border-radius:20px;padding:50px 30px}.release h2{font-size:34px}.release .download-help{font-size:11px;margin:20px 0 0}.download-help a{color:var(--accent);white-space:nowrap}.faq{grid-template-columns:1fr 1.45fr}.faq h2{font-size:32px}.faq-list summary{font-size:13px}.footer-links{display:flex;gap:24px}footer{font-size:11px}.muted{color:var(--muted)}
 /* 404：短页在导航与 footer 之间垂直居中；标题对齐 section 字阶（34px，≤600px 随 h2 系降到 27px）。 */
 .error{min-height:62vh;display:flex;align-items:center}
 .error h1{font-size:34px;font-weight:600;letter-spacing:-.7px}
 .error .muted{max-width:34em;margin:12px 0 26px}
-@media(max-width:900px){.sharing,.privacy,.faq{gap:35px}.channel-list article{grid-template-columns:115px 1fr;gap:18px}.feature-card{padding:21px}.app-art span,.app-art span:nth-child(2){min-width:0;font-size:9px;padding:0 8px}.section-head h2{font-size:29px}.section{padding-top:60px;padding-bottom:60px}}
-@media(max-width:600px){.native .hero-grid{padding-top:39px;gap:31px}.native .hero h1{font-size:40px;letter-spacing:-1.8px}.native .hero-sub{font-size:14px}.native .hero-note{font-size:10px}.native .hero-cta{gap:9px}.btn{padding:12px 17px;font-size:12px}.native .demo-status{max-width:100%;font-size:10px;padding:7px 10px}.demo-disclaimer{font-size:10px}.section{padding-top:48px;padding-bottom:48px}.section-head h2,.privacy h2,.faq h2{font-size:27px;line-height:1.45}.error h1{font-size:27px}.feature-card{padding:23px}.feature-art{margin-top:22px}.app-art span,.app-art span:nth-child(2){min-width:65px;font-size:11px}.path-art{font-size:11px;padding:16px}.usage{margin-top:30px;padding-top:24px}.steps{gap:20px}.steps li{gap:14px}.steps b{width:24px;height:24px;font-size:11px}.steps h3{font-size:14px}.steps p{font-size:12px}.usage-note{font-size:11px;line-height:1.9;margin-top:22px}.technical-details summary{font-size:12px}.sharing,.privacy,.faq{grid-template-columns:1fr;gap:20px}.native .sharing .section-head{margin-bottom:0}.channel-list article{grid-template-columns:95px 1fr;gap:18px;padding:20px 0}.channel-list article:first-child{padding-top:10px}.channel-list p{font-size:12px}.channel-list h3{font-size:14px}.section-description{font-size:13px}.privacy-copy h3{font-size:16px}.platform-list{grid-template-columns:1fr;gap:24px}.platforms{padding-top:20px}.platform-list p{font-size:12px}.release{padding:40px 23px}.release h2{font-size:29px}.release .download-help{font-size:10px}.footer-links{width:100%;gap:24px}footer>span{margin-left:auto}}
-@media(max-width:360px){.native .hero h1{font-size:35px}.native .hero-sub{font-size:12px}.hero .btn{padding:11px 13px;font-size:11px}.channel-list article{grid-template-columns:83px 1fr;gap:15px}.section-head h2{font-size:25px}}
+@media(max-width:900px){.sharing,.privacy,.faq{gap:35px}.section-head h2{font-size:29px}.section{padding-top:60px;padding-bottom:60px}}
+@media(max-width:600px){.native .hero-grid{padding-top:39px;gap:31px}.native .hero h1{font-size:40px;letter-spacing:-1.8px}.native .hero-sub{font-size:15px}.native .hero-note{font-size:10px}.native .hero-cta{gap:9px}.btn{padding:12px 17px;font-size:12px}.native .demo-status{max-width:100%;font-size:10px;padding:7px 10px}.demo-disclaimer{font-size:11px}.section{padding-top:48px;padding-bottom:48px}.section-head h2,.privacy h2,.faq h2{font-size:27px;line-height:1.45}.error h1{font-size:27px}.usage{margin-top:30px;padding-top:24px}.steps{gap:20px}.steps li{gap:14px}.steps b{width:24px;height:24px;font-size:11px}.steps h3{font-size:14px}.steps p{font-size:12px}.technical-details summary{font-size:12px}.sharing,.privacy,.faq{grid-template-columns:1fr;gap:20px}.native .sharing .section-head{margin-bottom:0}.section-description{font-size:13px}.privacy-copy h3{font-size:16px}.platform-list{grid-template-columns:1fr;gap:24px}.platforms{padding-top:20px}.platform-list p{font-size:12px}.release{padding:40px 23px}.release h2{font-size:29px}.release .download-help{font-size:10px}.footer-links{width:100%;gap:24px}footer>span{margin-left:auto}}
+@media(max-width:360px){.native .hero h1{font-size:35px}.hero .btn{padding:11px 13px;font-size:11px}.section-head h2{font-size:25px}}
 /* Preview controls change the wheel, independently of the page theme. */
 .demo-themes{display:flex;gap:2px;border:1px solid var(--line);border-radius:6px;padding:2px;background:var(--soft)}.demo-themes button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:10px;padding:3px 9px;border-radius:4px}.demo-themes button[aria-pressed=true]{background:var(--panel);color:var(--text);box-shadow:0 1px 3px #0001}
 .demo-window.theme-dark{--text:#edf4ff;--muted:#b0bdce;--line:#344659;--panel:#152130;--soft:#182535;--accent:#1768e9;background:#152130;border-color:#344659;color:#edf4ff}.native .demo-window.theme-dark .demo-desktop{background:#0e131b}.demo-window.theme-dark .radial-base{background:repeating-conic-gradient(from -18deg,transparent 0 35.6deg,#435162 35.6deg 36deg),#1b2532}.demo-window.theme-dark .radial-hub{background:#0a121c}.native .demo-window.theme-dark .demo-file svg{color:#b8d4fb}.demo-window.theme-dark .demo-status{color:#d4e4fc}.demo-window.theme-dark .demo-toolbar,.demo-window.theme-dark .demo-footer{background:#192638}
-@media(max-width:600px){.demo-themes button{font-size:9px;padding:3px 7px}.demo-toolbar{gap:5px}.demo-toolbar>span:nth-child(2){font-size:8px}.demo-disclaimer{max-width:310px;margin-left:auto;margin-right:auto}}
+@media(max-width:600px){.demo-themes button{font-size:10px;padding:3px 7px}.demo-toolbar{gap:5px}.demo-disclaimer{max-width:310px;margin-left:auto;margin-right:auto}}
 
 /* Frosted preview: the desktop stays visible through the wheel. */
 .native .demo-window.theme-glass .demo-desktop{background:radial-gradient(ellipse at 70% 20%,#aac8e5,transparent 60%),radial-gradient(ellipse at 20% 85%,#c3dcd1,transparent 65%),#e7edf4}
@@ -273,61 +247,23 @@ footer>a:last-child{width:100%}
 .demo-window.theme-glass .radial-base{background:repeating-conic-gradient(from -18deg,transparent 0 35.6deg,#ffffff85 35.6deg 36deg),#ffffff30;backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%);border-color:#ffffffc9;box-shadow:inset 0 1px 2px #fff9,0 12px 32px #27425b18}
 .demo-window.theme-glass .radial-base::after{border-color:#ffffffa0}
 .demo-window.theme-glass .radial-hub{background:#ffffff70;border-color:#fff9;box-shadow:0 0 0 5px #ffffff25}
-/* 选中扇区在毛玻璃上必须一眼可辨：accent 填充加扇区两侧白色发丝描边（与邻区硬分离）。 */
-.demo-window.theme-glass .radial-hl{background:conic-gradient(from -18deg,rgba(255,255,255,.95) 0 1.1deg,transparent 1.1deg 34.9deg,rgba(255,255,255,.95) 34.9deg 36deg),conic-gradient(from -18deg,rgba(23,104,233,.96) 0 36deg,transparent 36deg)}
+/* 选中扇区发丝描边已提为三主题统一规则（见 .radial-hl 定义处），玻璃亮色档不再单独覆写。 */
 @media(prefers-reduced-transparency:reduce){.demo-window.theme-glass .radial-base,.demo-window.theme-glass .radial-hub{background:#edf3f8}}
 /* 下载推荐徽标（download-detect.js） */
 .btn:has(.btn-badge){gap:9px}
 .btn-badge{display:inline-block;font-size:10px;font-weight:500;line-height:1;padding:4px 8px;border-radius:99px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5)}
 
-/* 免登录分享页（send.html）增量类，全部 send- 前缀防碰撞：卡片骨架照
-   app-login.css .login-card，链接大字卡照 .account-code-hero（accent 描边+
-   等宽+user-select:all 点按全选），拖拽区/进度条为本页新形态；.btn/.muted/
-   .note-warn 等既有类直接复用，不在此重复。 */
-.send-card{margin:auto;width:100%;max-width:620px;background:#f6f7f9;border-radius:16px;padding:30px 30px 26px}
-.send-card h1{font-size:27px;font-weight:600;letter-spacing:-.7px;margin-bottom:12px}
-.send-drop{border:2px dashed var(--line);border-radius:16px;background:var(--panel);padding:42px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
-.send-drop:hover,.send-drop:focus-visible,.send-drop.is-over{border-color:var(--accent);background:var(--soft)}
-.send-drop svg{width:34px;height:34px;margin:0 auto;color:var(--accent)}
-.send-drop-title{font-size:15px;font-weight:500;margin:12px 0 6px}
-.send-drop-hint{font-size:12px;color:var(--muted);margin:0}
-.send-agree{font-size:11.5px;color:var(--muted);line-height:1.8;margin:14px 0 0}
-.send-agree a{color:var(--accent);text-decoration:underline}
-.send-disclose{margin-top:26px}
-.send-file-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:14px}
-.send-file-name{font-size:14px;font-weight:500;word-break:break-all}
-.send-file-meta{font-size:11.5px;color:var(--muted);margin:2px 0 0}
-.send-status{font-size:12px;color:var(--muted);line-height:1.7;margin:0 0 12px}
-.send-status.is-error{color:#a33d2e}
-.send-bar{height:8px;border-radius:99px;background:var(--soft);overflow:hidden;margin:0 0 14px}
-.send-fill{height:100%;width:0;border-radius:99px;background:var(--accent);transition:width .2s ease}
-.send-link-hero{margin:0 0 8px;padding:16px 14px;border:1.5px solid var(--accent);border-radius:16px;background:var(--panel);text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.6;word-break:break-all;user-select:all;-webkit-user-select:all}
-.send-caption{font-size:11.5px;color:var(--muted);text-align:center;margin:0 0 14px}
-.send-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 16px}
-.send-actions .btn{min-width:130px}
-.send-warn{font-size:12px;line-height:1.8;background:var(--soft);border-radius:12px;padding:12px 14px;margin:0 0 10px}
-.send-warn p{margin:0 0 4px}
-.send-warn p:last-child{margin-bottom:0}
-.send-warn-lead{font-weight:600}
-.send-warn-fatal{color:#8a6116}
-.send-note{font-size:11.5px;color:var(--muted);line-height:1.8;margin:0 0 6px}
-.send-note-en{font-size:10.5px;opacity:.85}
-#send-qr{margin:0 0 14px;text-align:center}
-#send-qr-canvas{display:block;width:128px;height:128px;margin:0 auto 4px;image-rendering:pixelated;background:#fff;border:1px solid var(--line);border-radius:8px}
-#send-stage-busy .send-drop-hint{margin:0 0 12px}
-.send-pitch{font-size:12.5px;color:var(--muted);text-align:center;line-height:1.8;margin:26px 0 12px}
-.send-cta{display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
-@media(max-width:600px){.send-card{padding:24px 20px}.send-card h1{font-size:24px}.send-drop{padding:34px 14px}.send-actions .btn{flex:1;justify-content:center;min-width:0}}
-
 /* Function-led homepage and matching guide. */
 .nav-links a.is-active{color:var(--accent)}
 .function-overview{padding-top:28px}
-.function-index{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.function-index>a{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:24px;background:#f2f4f7;border:1px solid transparent;border-radius:16px;transition:background .15s,border-color .15s}
-.function-index>a:hover{background:var(--panel);border-color:var(--line)}
+.function-index{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.function-index>article{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:24px;background:#f2f4f7;border:1px solid transparent;border-radius:16px;transition:background .15s,border-color .15s}
+.function-index>article:hover{background:var(--panel);border-color:var(--line)}
 .function-index-number{font-size:12px;font-variant-numeric:tabular-nums;color:var(--accent);margin-bottom:20px}
 .function-index h3{font-size:19px;margin-bottom:7px}
 .function-index p{font-size:12px;color:var(--muted);margin-bottom:24px}
+.function-index .function-index-sub{font-size:12px;margin-top:-16px;margin-bottom:20px}
+.function-index .function-index-sub a{color:var(--accent);text-decoration:underline}
 .function-index-link{font-size:12px;color:var(--accent);margin-top:auto}
 .function-index-link span{margin-left:6px}
 .function-section{display:grid;grid-template-columns:1fr 1.65fr;gap:80px;border-top:1px solid var(--line)}
@@ -364,13 +300,15 @@ kbd{display:inline-block;min-width:24px;padding:1px 5px;border:1px solid var(--l
 .route-caption{display:block;font-size:10px;color:var(--muted);font-weight:400;margin-top:7px}
 .route-relay{border:1px solid #c9d8ee;border-radius:10px;padding:14px 16px;background:var(--panel);font-size:12px}
 .route-arrow{color:#8aa5c8;font-size:20px}
-.share-options{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
 .share-option{background:#f2f4f7;border-radius:16px;padding:26px}
 .function-label{font-size:10px;color:var(--accent);margin-bottom:19px}
 .share-option h3{font-size:20px;line-height:1.5;letter-spacing:-.4px}
 .share-option .btn,.share-option .text-link{margin-top:22px}
 .share-option .btn{padding:11px 17px;font-size:12px}
-.function-platforms{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.function-platforms{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+/* 平台矩阵 4+1 → 4 等重客户端卡 + iOS 说明行（跨列文本行，消灭第 5 张孤卡）。 */
+.platform-note{grid-column:1/-1;margin:0;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.platform-note a{color:var(--accent)}
 .faq-list p a,.section-description a{color:var(--accent)}
 .guide-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:90px}
 .guide-sidebar{position:sticky;top:115px;align-self:start}
@@ -385,9 +323,9 @@ kbd{display:inline-block;min-width:24px;padding:1px 5px;border:1px solid var(--l
 .guide-copy h3{font-size:17px;margin-bottom:9px}
 .guide-copy p{font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:10px}
 .guide-copy p a{color:var(--accent);text-decoration:underline}
-@media(max-width:1100px){.function-section{gap:44px;grid-template-columns:1fr 1.6fr}.function-heading h2{font-size:30px}.function-index>a{padding:20px}.share-options{grid-template-columns:1fr}.function-platforms{grid-template-columns:1fr 1fr;gap:26px}.guide-layout{gap:45px;grid-template-columns:210px minmax(0,1fr)}}
-@media(min-width:601px) and (max-width:900px){.nav{flex-wrap:wrap;gap:12px}.nav-links{order:3;width:100%;justify-content:space-between;padding-bottom:14px}.function-index{grid-template-columns:1fr 1fr}.function-section{grid-template-columns:1fr;gap:28px}.function-heading h2 br{display:none}.function-heading>p:not(.function-number){max-width:48em}.function-number{margin-bottom:10px}}
-@media(max-width:600px){.nav-links{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:14px 24px}.function-index{grid-template-columns:1fr 1fr;gap:10px}.function-index>a{padding:18px 15px}.function-index h3{font-size:16px}.function-index p{font-size:11px;margin-bottom:18px}.function-index-number{margin-bottom:14px}.function-index-link{font-size:10px}.function-overview{padding-top:20px}.function-section{grid-template-columns:1fr;gap:26px}.function-heading h2{font-size:28px;margin-bottom:14px}.function-heading h2 br{display:none}.function-heading>p:not(.function-number){font-size:13px}.function-number{margin-bottom:10px}.function-heading>.text-link{margin-top:16px}.capability-list h3{font-size:17px}.function-section .steps{grid-template-columns:1fr;gap:18px}.compact-capabilities{grid-template-columns:1fr;gap:22px}.capture-example-paper{margin:20px;padding:20px}.capture-example-tools{gap:16px}.device-route{padding:23px 15px;gap:8px;font-size:13px}.route-relay{padding:11px 9px;font-size:10px}.route-caption{font-size:9px}.route-arrow{font-size:16px}.share-options{grid-template-columns:1fr}.share-option{padding:23px}.function-platforms{grid-template-columns:1fr;gap:24px}.guide-layout{grid-template-columns:1fr;gap:30px}.guide-sidebar{position:static}.guide-nav{flex-direction:row;flex-wrap:wrap;gap:6px;margin:20px 0}.guide-nav a{background:var(--soft);font-size:12px}.guide-group{margin-bottom:32px;padding-bottom:18px}.guide-group h2{font-size:23px}.guide-copy p{font-size:12px}}
+@media(max-width:1100px){.function-section{gap:44px;grid-template-columns:1fr 1.6fr}.function-heading h2{font-size:30px}.function-index>article{padding:20px}.function-platforms{grid-template-columns:1fr 1fr;gap:26px}.guide-layout{gap:45px;grid-template-columns:210px minmax(0,1fr)}}
+@media(min-width:601px) and (max-width:900px){.nav{flex-wrap:wrap;gap:12px}.nav-links{order:3;width:100%;justify-content:space-between;padding-bottom:14px}.function-index{grid-template-columns:1fr}.function-section{grid-template-columns:1fr;gap:28px}.function-heading h2 br{display:none}.function-heading>p:not(.function-number){max-width:48em}.function-number{margin-bottom:10px}}
+@media(max-width:600px){.nav-links{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:14px 24px}.function-index{grid-template-columns:1fr;gap:10px}.function-index>article{padding:18px 15px}.function-index h3{font-size:16px}.function-index p{font-size:11px;margin-bottom:18px}.function-index-number{margin-bottom:14px}.function-index-link{font-size:10px}.function-overview{padding-top:20px}.function-section{grid-template-columns:1fr;gap:26px}.function-heading h2{font-size:28px;margin-bottom:14px}.function-heading h2 br{display:none}.function-heading>p:not(.function-number){font-size:13px}.function-number{margin-bottom:10px}.function-heading>.text-link{margin-top:16px}.capability-list h3{font-size:17px}.function-section .steps{grid-template-columns:1fr;gap:18px}.compact-capabilities{grid-template-columns:1fr;gap:22px}.capture-example-paper{margin:20px;padding:20px}.capture-example-tools{gap:16px}.device-route{padding:23px 15px;gap:8px;font-size:13px}.route-relay{padding:11px 9px;font-size:10px}.route-caption{font-size:9px}.route-arrow{font-size:16px}.share-option{padding:23px}.function-platforms{grid-template-columns:1fr;gap:24px}.guide-layout{grid-template-columns:1fr;gap:30px}.guide-sidebar{position:static}.guide-nav{flex-direction:row;flex-wrap:wrap;gap:6px;margin:20px 0}.guide-nav a{background:var(--soft);font-size:12px}.guide-group{margin-bottom:32px;padding-bottom:18px}.guide-group h2{font-size:23px}.guide-copy p{font-size:12px}}
 
 /* ======================================================================
    2026-10-21 官网品牌视觉改版 —— glass 深色主题（body.brand-dark，仅 index.html）
@@ -397,7 +335,11 @@ kbd{display:inline-block;min-width:24px;padding:1px 5px;border:1px solid var(--l
    轮盘母题 = 十扇区 36°、k=1 右上 accent 扇区、扇区间留缝。
    深色面上小号 accent 文本统一用 --accent-2（accent 向白混合的同色相提亮，
    render-appicon.swift blended(white:) 同款手法，不引入新色相）；accent 本值
-   只作填充/大字/描边。作用域限定 body.brand-dark，其余七页（docs/app/…）零影响。
+   只作填充/大字/描边。作用域限定 body.brand-dark——2026-10-21 门户化起由
+   index/wheel/sync/docs 四页共用（docs 为主路径品牌连续性在复审轮加入，guide
+   版式专属适配见下方 guide-nav/guide-copy 两条），其余四页（app/send/terms/
+   report/privacy）与 404 保持浅色：app 为自有登录版式，公告/条款/隐私为法务
+   口径页；原「#share 三卡」网格规则随该节迁 sync.html 继续生效。
    ====================================================================== */
 .brand-dark{--bg:#10151D;--panel:#171E29;--text:#ECF0F7;--muted:#A2AFC1;--line:rgba(255,255,255,.09);--soft:#1B2432;--accent:#1768E9;--accent-2:#6EA6F4;--shadow:0 24px 64px rgba(0,0,0,.5);color-scheme:dark;background:var(--bg);color:var(--text)}
 .brand-dark a:focus-visible,.brand-dark button:focus-visible,.brand-dark summary:focus-visible{outline-color:var(--accent-2)}
@@ -431,8 +373,9 @@ kbd{display:inline-block;min-width:24px;padding:1px 5px;border:1px solid var(--l
 .brand-dark .demo-window.theme-glass .radial-base{background:repeating-conic-gradient(from -18deg,transparent 0 35.6deg,rgba(255,255,255,.5) 35.6deg 36deg),rgba(255,255,255,.07);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%);border-color:rgba(255,255,255,.38);box-shadow:inset 0 1px 2px rgba(255,255,255,.28),0 16px 40px rgba(0,0,0,.42)}
 .brand-dark .demo-window.theme-glass .radial-base::after{border-color:rgba(255,255,255,.3)}
 .brand-dark .demo-window.theme-glass .radial-hub{background:rgba(10,18,28,.78);border-color:rgba(255,255,255,.3);box-shadow:0 0 0 5px rgba(255,255,255,.06)}
-/* 暗色毛玻璃同款强化：亮化 accent 填充 + 白色发丝描边，选中扇区与邻区硬分离。 */
-.brand-dark .demo-window.theme-glass .radial-hl{background:conic-gradient(from -18deg,rgba(255,255,255,.92) 0 1.1deg,transparent 1.1deg 34.9deg,rgba(255,255,255,.92) 34.9deg 36deg),conic-gradient(from -18deg,rgba(46,123,240,.92) 0 36deg,transparent 36deg)}
+/* 暗色毛玻璃同款强化收敛为主题变量：发丝描边与填充走统一 .radial-hl 规则，
+   此处只覆写亮化 accent 填充（render-appicon.swift blended(white:) 同值）。 */
+.brand-dark .demo-window.theme-glass{--hl-fill:rgba(46,123,240,.92)}
 .brand-dark .demo-window.theme-glass .demo-desktop::before{opacity:1;background:linear-gradient(145deg,transparent 0 40%,rgba(255,255,255,.04) 40% 53%,transparent 53%),linear-gradient(35deg,transparent 0 55%,rgba(255,255,255,.05) 55% 70%,transparent 70%)}
 .brand-dark .radial-hub{background:#141A24;border-color:rgba(255,255,255,.24)}
 .brand-dark .radial-hub svg{color:#A9C7F5}
@@ -467,10 +410,11 @@ kbd{display:inline-block;min-width:24px;padding:1px 5px;border:1px solid var(--l
 @media(prefers-reduced-transparency:reduce){.brand-dark .demo-window.theme-glass .radial-base,.brand-dark .demo-window.theme-glass .radial-hub{background:#1D2531}}
 
 /* ---- 三大卖点卡 + 如实状态卡 ---- */
-.brand-dark .function-index>a{background:linear-gradient(180deg,#18202C,#151B25);border:1px solid rgba(255,255,255,.08);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 34px rgba(0,0,0,.28);transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
-.brand-dark .function-index>a:hover{border-color:rgba(110,166,244,.45);transform:translateY(-3px);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 22px 44px rgba(0,0,0,.4)}
+.brand-dark .function-index>article{background:linear-gradient(180deg,#18202C,#151B25);border:1px solid rgba(255,255,255,.08);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 34px rgba(0,0,0,.28);transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.brand-dark .function-index>article:hover{border-color:rgba(110,166,244,.45);transform:translateY(-3px);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 22px 44px rgba(0,0,0,.4)}
 .brand-dark .function-index-number{color:var(--accent-2)}
 .brand-dark .function-index-link{color:var(--accent-2)}
+.brand-dark .function-index-sub a,.brand-dark .platform-note a{color:var(--accent-2)}
 
 /* ---- 功能区分块 ---- */
 .brand-dark .function-section{border-top-color:rgba(255,255,255,.08)}
@@ -512,6 +456,9 @@ kbd{display:inline-block;min-width:24px;padding:1px 5px;border:1px solid var(--l
 .brand-dark .privacy,.brand-dark .faq-list,.brand-dark details{border-top-color:rgba(255,255,255,.08)}
 .brand-dark summary span{color:var(--accent-2)}
 .brand-dark details a,.brand-dark .faq-list p a,.brand-dark .section-description a{color:var(--accent-2)}
+/* docs.html（guide 版式）入 brand-dark 后的专属适配：侧栏目录悬停与正文小字链接提亮 */
+.brand-dark .guide-nav a:hover{color:var(--accent-2)}
+.brand-dark .guide-copy p a{color:var(--accent-2)}
 
 /* ---- 平台区：五端卡片 + 图标 ---- */
 .brand-dark .platform-list{border-top-color:rgba(255,255,255,.08);gap:16px}
@@ -553,6 +500,8 @@ kbd{display:inline-block;min-width:24px;padding:1px 5px;border:1px solid var(--l
 html.reveal-on .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
 html.reveal-on .reveal.is-in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html.reveal-on .reveal{opacity:1;transform:none}}
+/* 打印/PDF 导出：渐入初始态（opacity:0）不适用于纸面，全部元素强制可见。 */
+@media print{html.reveal-on .reveal{opacity:1;transform:none}}
 
 /* ---- 品牌主题移动端 ---- */
 @media(max-width:1100px){
