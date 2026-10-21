@@ -3,7 +3,7 @@
   'use strict';
   var d = typeof document !== 'undefined' ? document : null;
   var FALLBACK_VERSION = '0.1.9';
-  var DETECT_TEXT = { macos: '已检测到 macOS：推荐下载 macOS 版', windows: '已检测到 Windows：推荐下载 Windows 版' };
+  var DETECT_TEXT = { macos: '（已检测到 macOS，推荐下载 macOS 版）', windows: '（已检测到 Windows，推荐下载 Windows 版）' };
 
   function detectOS(ua, touch) {
     ua = String(ua || '');
@@ -57,7 +57,7 @@
       badge.textContent = '为你的系统推荐';
       target.appendChild(badge);
     }
-    if (lede && DETECT_TEXT[os]) lede.textContent += ' ' + DETECT_TEXT[os];
+    if (lede && DETECT_TEXT[os]) lede.textContent += DETECT_TEXT[os];
   }
   function discoverVersion() {
     if (!d || typeof window.fetch !== 'function') return;

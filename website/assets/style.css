@@ -192,11 +192,11 @@ footer{margin:0 32px}
 .demo-toolbar{padding:0 12px;font-size:9px}
 .demo-desktop{padding-top:75px}
 .demo-file{font-size:10px;left:17px}
-.radial-label{font-size:9px;width:52px;height:46px;gap:4px}
+.radial-label{font-size:10px;width:52px;height:46px;gap:4px}
 .radial-label svg{width:17px;height:17px}
-.demo-footer{font-size:8px;padding:10px}
-.demo-disclaimer{font-size:9px}
-.demo-status{font-size:9px;max-width:96%}
+.demo-footer{font-size:9px;padding:10px}
+.demo-disclaimer{font-size:10px}
+.demo-status{font-size:10px;max-width:96%}
 .section{padding:55px 20px}
 .section-head{margin-bottom:28px}
 h2{font-size:31px;letter-spacing:-1px}
@@ -235,7 +235,7 @@ footer>a:last-child{width:100%}
 .native .demo-desktop{padding-top:72px;padding-bottom:18px}
 .native .demo-file{position:absolute;top:18px;left:18px;max-width:none;flex-direction:row;align-items:center;text-align:left}
 .native .demo-file svg{width:25px;height:29px}
-.native .demo-status{position:relative;top:auto;right:auto;max-width:100%;font-size:9px;margin:24px auto 0;padding:7px 10px}
+.native .demo-status{position:relative;top:auto;right:auto;max-width:100%;font-size:10px;margin:24px auto 0;padding:7px 10px}
 .native .privacy h2{max-width:none}
 .native .section-head{text-align:left}
 }
@@ -245,10 +245,10 @@ footer>a:last-child{width:100%}
 .nav-actions{gap:10px}
 .brand{gap:6px}
 .hero-grid,.native .hero-grid{padding-left:16px;padding-right:16px}
-.radial-label{font-size:8px;width:47px}
+.radial-label{font-size:9px;width:47px}
 .radial-label svg{width:15px;height:15px}
 .btn{padding:11px 14px;gap:10px}
-.demo-footer>span:last-child{font-size:7px}
+.demo-footer>span:last-child{font-size:8px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 /* Final homepage: quieter surfaces and descriptive product copy. */
@@ -258,7 +258,7 @@ footer>a:last-child{width:100%}
 .error h1{font-size:34px;font-weight:600;letter-spacing:-.7px}
 .error .muted{max-width:34em;margin:12px 0 26px}
 @media(max-width:900px){.sharing,.privacy,.faq{gap:35px}.channel-list article{grid-template-columns:115px 1fr;gap:18px}.feature-card{padding:21px}.app-art span,.app-art span:nth-child(2){min-width:0;font-size:9px;padding:0 8px}.section-head h2{font-size:29px}.section{padding-top:60px;padding-bottom:60px}}
-@media(max-width:600px){.native .hero-grid{padding-top:39px;gap:31px}.native .hero h1{font-size:40px;letter-spacing:-1.8px}.native .hero-sub{font-size:13px}.native .hero-note{font-size:10px}.native .hero-cta{gap:9px}.btn{padding:12px 17px;font-size:12px}.native .demo-status{max-width:100%;font-size:9px;padding:7px 10px}.demo-disclaimer{font-size:9px}.section{padding-top:48px;padding-bottom:48px}.section-head h2,.privacy h2,.faq h2{font-size:27px;line-height:1.45}.error h1{font-size:27px}.feature-card{padding:23px}.feature-art{margin-top:22px}.app-art span,.app-art span:nth-child(2){min-width:65px;font-size:11px}.path-art{font-size:11px;padding:16px}.usage{margin-top:30px;padding-top:24px}.steps{gap:20px}.steps li{gap:14px}.steps b{width:24px;height:24px;font-size:11px}.steps h3{font-size:14px}.steps p{font-size:12px}.usage-note{font-size:11px;line-height:1.9;margin-top:22px}.technical-details summary{font-size:12px}.sharing,.privacy,.faq{grid-template-columns:1fr;gap:20px}.native .sharing .section-head{margin-bottom:0}.channel-list article{grid-template-columns:95px 1fr;gap:18px;padding:20px 0}.channel-list article:first-child{padding-top:10px}.channel-list p{font-size:12px}.channel-list h3{font-size:14px}.section-description{font-size:13px}.privacy-copy h3{font-size:16px}.platform-list{grid-template-columns:1fr;gap:24px}.platforms{padding-top:20px}.platform-list p{font-size:12px}.release{padding:40px 23px}.release h2{font-size:29px}.release .download-help{font-size:10px}.footer-links{width:100%;gap:24px}footer>span{margin-left:auto}}
+@media(max-width:600px){.native .hero-grid{padding-top:39px;gap:31px}.native .hero h1{font-size:40px;letter-spacing:-1.8px}.native .hero-sub{font-size:14px}.native .hero-note{font-size:10px}.native .hero-cta{gap:9px}.btn{padding:12px 17px;font-size:12px}.native .demo-status{max-width:100%;font-size:10px;padding:7px 10px}.demo-disclaimer{font-size:10px}.section{padding-top:48px;padding-bottom:48px}.section-head h2,.privacy h2,.faq h2{font-size:27px;line-height:1.45}.error h1{font-size:27px}.feature-card{padding:23px}.feature-art{margin-top:22px}.app-art span,.app-art span:nth-child(2){min-width:65px;font-size:11px}.path-art{font-size:11px;padding:16px}.usage{margin-top:30px;padding-top:24px}.steps{gap:20px}.steps li{gap:14px}.steps b{width:24px;height:24px;font-size:11px}.steps h3{font-size:14px}.steps p{font-size:12px}.usage-note{font-size:11px;line-height:1.9;margin-top:22px}.technical-details summary{font-size:12px}.sharing,.privacy,.faq{grid-template-columns:1fr;gap:20px}.native .sharing .section-head{margin-bottom:0}.channel-list article{grid-template-columns:95px 1fr;gap:18px;padding:20px 0}.channel-list article:first-child{padding-top:10px}.channel-list p{font-size:12px}.channel-list h3{font-size:14px}.section-description{font-size:13px}.privacy-copy h3{font-size:16px}.platform-list{grid-template-columns:1fr;gap:24px}.platforms{padding-top:20px}.platform-list p{font-size:12px}.release{padding:40px 23px}.release h2{font-size:29px}.release .download-help{font-size:10px}.footer-links{width:100%;gap:24px}footer>span{margin-left:auto}}
 @media(max-width:360px){.native .hero h1{font-size:35px}.native .hero-sub{font-size:12px}.hero .btn{padding:11px 13px;font-size:11px}.channel-list article{grid-template-columns:83px 1fr;gap:15px}.section-head h2{font-size:25px}}
 /* Preview controls change the wheel, independently of the page theme. */
 .demo-themes{display:flex;gap:2px;border:1px solid var(--line);border-radius:6px;padding:2px;background:var(--soft)}.demo-themes button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:10px;padding:3px 9px;border-radius:4px}.demo-themes button[aria-pressed=true]{background:var(--panel);color:var(--text);box-shadow:0 1px 3px #0001}
@@ -273,6 +273,8 @@ footer>a:last-child{width:100%}
 .demo-window.theme-glass .radial-base{background:repeating-conic-gradient(from -18deg,transparent 0 35.6deg,#ffffff85 35.6deg 36deg),#ffffff30;backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%);border-color:#ffffffc9;box-shadow:inset 0 1px 2px #fff9,0 12px 32px #27425b18}
 .demo-window.theme-glass .radial-base::after{border-color:#ffffffa0}
 .demo-window.theme-glass .radial-hub{background:#ffffff70;border-color:#fff9;box-shadow:0 0 0 5px #ffffff25}
+/* 选中扇区在毛玻璃上必须一眼可辨：accent 填充加扇区两侧白色发丝描边（与邻区硬分离）。 */
+.demo-window.theme-glass .radial-hl{background:conic-gradient(from -18deg,rgba(255,255,255,.95) 0 1.1deg,transparent 1.1deg 34.9deg,rgba(255,255,255,.95) 34.9deg 36deg),conic-gradient(from -18deg,rgba(23,104,233,.96) 0 36deg,transparent 36deg)}
 @media(prefers-reduced-transparency:reduce){.demo-window.theme-glass .radial-base,.demo-window.theme-glass .radial-hub{background:#edf3f8}}
 /* 下载推荐徽标（download-detect.js） */
 .btn:has(.btn-badge){gap:9px}
@@ -310,6 +312,261 @@ footer>a:last-child{width:100%}
 .send-warn-fatal{color:#8a6116}
 .send-note{font-size:11.5px;color:var(--muted);line-height:1.8;margin:0 0 6px}
 .send-note-en{font-size:10.5px;opacity:.85}
+#send-qr{margin:0 0 14px;text-align:center}
+#send-qr-canvas{display:block;width:128px;height:128px;margin:0 auto 4px;image-rendering:pixelated;background:#fff;border:1px solid var(--line);border-radius:8px}
+#send-stage-busy .send-drop-hint{margin:0 0 12px}
 .send-pitch{font-size:12.5px;color:var(--muted);text-align:center;line-height:1.8;margin:26px 0 12px}
 .send-cta{display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
 @media(max-width:600px){.send-card{padding:24px 20px}.send-card h1{font-size:24px}.send-drop{padding:34px 14px}.send-actions .btn{flex:1;justify-content:center;min-width:0}}
+
+/* Function-led homepage and matching guide. */
+.nav-links a.is-active{color:var(--accent)}
+.function-overview{padding-top:28px}
+.function-index{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.function-index>a{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:24px;background:#f2f4f7;border:1px solid transparent;border-radius:16px;transition:background .15s,border-color .15s}
+.function-index>a:hover{background:var(--panel);border-color:var(--line)}
+.function-index-number{font-size:12px;font-variant-numeric:tabular-nums;color:var(--accent);margin-bottom:20px}
+.function-index h3{font-size:19px;margin-bottom:7px}
+.function-index p{font-size:12px;color:var(--muted);margin-bottom:24px}
+.function-index-link{font-size:12px;color:var(--accent);margin-top:auto}
+.function-index-link span{margin-left:6px}
+.function-section{display:grid;grid-template-columns:1fr 1.65fr;gap:80px;border-top:1px solid var(--line)}
+.function-heading{align-self:start}
+.function-number{font-size:12px;color:var(--accent);margin-bottom:20px}
+.function-heading h2{font-size:34px;letter-spacing:-1px;line-height:1.45;margin-bottom:20px}
+.function-heading>p:not(.function-number){font-size:14px;color:var(--muted);max-width:27em}
+.text-link{display:inline-block;color:var(--accent);font-size:12px;line-height:1.8}
+.text-link:hover{text-decoration:underline}
+.function-heading>.text-link{margin-top:22px}
+.function-body{min-width:0}
+.capability-list>article{padding:22px 0;border-bottom:1px solid var(--line)}
+.capability-list>article:first-child{padding-top:0}
+.capability-list h3{font-size:18px;letter-spacing:-.25px;margin-bottom:8px}
+.capability-list p,.share-option>p:not(.function-label){font-size:13px;color:var(--muted);line-height:1.9}
+.function-note,.capability-list .function-note,.share-option .function-note{font-size:11px;line-height:1.9;color:var(--muted);margin-top:14px}
+.function-note a{text-decoration:underline}
+.function-body>.text-link{margin-top:18px}
+.function-section .usage{margin-top:28px;padding-top:0;border-top:0}
+.function-section .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+kbd{display:inline-block;min-width:24px;padding:1px 5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;background:var(--panel);font:inherit;text-align:center;color:var(--text)}
+.capture-example{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#edf2f8;margin-bottom:28px}
+.capture-example-bar{display:flex;justify-content:space-between;gap:12px;padding:12px 18px;background:var(--panel);border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)}
+.capture-example-paper{max-width:360px;margin:26px auto;padding:22px 28px;background:var(--panel);border-radius:8px;border:1px solid var(--line)}
+.capture-example-file{display:block;color:var(--muted);font-size:10px;margin-bottom:15px}
+.capture-example-paper strong{font-size:18px;font-weight:600}
+.capture-example-paper p{font-size:13px;margin-top:9px;color:#525e70}
+.capture-example-paper .capture-example-mark{border:2px solid #bd4d43;border-radius:3px;padding:4px 10px;margin-left:-12px;margin-right:20px;color:var(--text);position:relative}
+.capture-example-mark span{position:absolute;right:-44px;top:-7px;font-size:30px;color:#bd4d43}
+.capture-example-tools{display:flex;justify-content:center;gap:20px;padding:12px;background:var(--panel);border-top:1px solid var(--line);font-size:11px;color:#536076}
+.compact-capabilities{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.compact-capabilities>article,.compact-capabilities>article:first-child{padding:0;border:0}
+.device-route{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:30px 22px;background:var(--soft);border-radius:16px;margin-bottom:28px;text-align:center;font-size:16px;font-weight:500}
+.route-caption{display:block;font-size:10px;color:var(--muted);font-weight:400;margin-top:7px}
+.route-relay{border:1px solid #c9d8ee;border-radius:10px;padding:14px 16px;background:var(--panel);font-size:12px}
+.route-arrow{color:#8aa5c8;font-size:20px}
+.share-options{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.share-option{background:#f2f4f7;border-radius:16px;padding:26px}
+.function-label{font-size:10px;color:var(--accent);margin-bottom:19px}
+.share-option h3{font-size:20px;line-height:1.5;letter-spacing:-.4px}
+.share-option .btn,.share-option .text-link{margin-top:22px}
+.share-option .btn{padding:11px 17px;font-size:12px}
+.function-platforms{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.faq-list p a,.section-description a{color:var(--accent)}
+.guide-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:90px}
+.guide-sidebar{position:sticky;top:115px;align-self:start}
+.guide-sidebar h1{font-size:29px;font-weight:600;letter-spacing:-.6px;margin-bottom:12px}
+.guide-sidebar>p{font-size:12px;color:var(--muted)}
+.guide-nav{display:flex;flex-direction:column;gap:8px;margin:24px 0}
+.guide-nav a{padding:7px 10px;font-size:13px;border-radius:6px;color:var(--muted)}
+.guide-nav a:hover{background:var(--soft);color:var(--accent)}
+.guide-group{margin-bottom:48px;border-bottom:1px solid var(--line);padding-bottom:30px}
+.guide-group h2{font-size:25px;letter-spacing:-.5px;margin-bottom:24px}
+.guide-copy article{margin-bottom:24px;scroll-margin-top:100px}
+.guide-copy h3{font-size:17px;margin-bottom:9px}
+.guide-copy p{font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:10px}
+.guide-copy p a{color:var(--accent);text-decoration:underline}
+@media(max-width:1100px){.function-section{gap:44px;grid-template-columns:1fr 1.6fr}.function-heading h2{font-size:30px}.function-index>a{padding:20px}.share-options{grid-template-columns:1fr}.function-platforms{grid-template-columns:1fr 1fr;gap:26px}.guide-layout{gap:45px;grid-template-columns:210px minmax(0,1fr)}}
+@media(min-width:601px) and (max-width:900px){.nav{flex-wrap:wrap;gap:12px}.nav-links{order:3;width:100%;justify-content:space-between;padding-bottom:14px}.function-index{grid-template-columns:1fr 1fr}.function-section{grid-template-columns:1fr;gap:28px}.function-heading h2 br{display:none}.function-heading>p:not(.function-number){max-width:48em}.function-number{margin-bottom:10px}}
+@media(max-width:600px){.nav-links{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:14px 24px}.function-index{grid-template-columns:1fr 1fr;gap:10px}.function-index>a{padding:18px 15px}.function-index h3{font-size:16px}.function-index p{font-size:11px;margin-bottom:18px}.function-index-number{margin-bottom:14px}.function-index-link{font-size:10px}.function-overview{padding-top:20px}.function-section{grid-template-columns:1fr;gap:26px}.function-heading h2{font-size:28px;margin-bottom:14px}.function-heading h2 br{display:none}.function-heading>p:not(.function-number){font-size:13px}.function-number{margin-bottom:10px}.function-heading>.text-link{margin-top:16px}.capability-list h3{font-size:17px}.function-section .steps{grid-template-columns:1fr;gap:18px}.compact-capabilities{grid-template-columns:1fr;gap:22px}.capture-example-paper{margin:20px;padding:20px}.capture-example-tools{gap:16px}.device-route{padding:23px 15px;gap:8px;font-size:13px}.route-relay{padding:11px 9px;font-size:10px}.route-caption{font-size:9px}.route-arrow{font-size:16px}.share-options{grid-template-columns:1fr}.share-option{padding:23px}.function-platforms{grid-template-columns:1fr;gap:24px}.guide-layout{grid-template-columns:1fr;gap:30px}.guide-sidebar{position:static}.guide-nav{flex-direction:row;flex-wrap:wrap;gap:6px;margin:20px 0}.guide-nav a{background:var(--soft);font-size:12px}.guide-group{margin-bottom:32px;padding-bottom:18px}.guide-group h2{font-size:23px}.guide-copy p{font-size:12px}}
+
+/* ======================================================================
+   2026-10-21 官网品牌视觉改版 —— glass 深色主题（body.brand-dark，仅 index.html）
+   设计语言真源 = Resources/Brand（scripts/render-appicon.swift 程序化管线）：
+   暗底 #1C2531→#10151D / 轮盘 accent #1768E9（RadialPalette.swift:7 轮盘真源，
+   与既有站点 accent 同源同值）/ 文字 #ECF0F7 / 次级 #A2AFC1 / 毂心 #0A121C；
+   轮盘母题 = 十扇区 36°、k=1 右上 accent 扇区、扇区间留缝。
+   深色面上小号 accent 文本统一用 --accent-2（accent 向白混合的同色相提亮，
+   render-appicon.swift blended(white:) 同款手法，不引入新色相）；accent 本值
+   只作填充/大字/描边。作用域限定 body.brand-dark，其余七页（docs/app/…）零影响。
+   ====================================================================== */
+.brand-dark{--bg:#10151D;--panel:#171E29;--text:#ECF0F7;--muted:#A2AFC1;--line:rgba(255,255,255,.09);--soft:#1B2432;--accent:#1768E9;--accent-2:#6EA6F4;--shadow:0 24px 64px rgba(0,0,0,.5);color-scheme:dark;background:var(--bg);color:var(--text)}
+.brand-dark a:focus-visible,.brand-dark button:focus-visible,.brand-dark summary:focus-visible{outline-color:var(--accent-2)}
+
+/* ---- 导航 ---- */
+.brand-dark .site-head{background:rgba(16,21,29,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom-color:rgba(255,255,255,.08)}
+.brand-dark .nav-links a:hover,.brand-dark .nav-links a.is-active{color:var(--accent-2)}
+.brand-dark .nav-cta{background:var(--panel);border-color:rgba(255,255,255,.16);color:var(--text)}
+.brand-dark .nav-cta:hover{border-color:rgba(110,166,244,.5)}
+
+/* ---- Hero：暗底渐变 + 纯 CSS 幽灵轮盘水印（DMG 背景同母题，右上出血） ---- */
+.brand-dark .hero{position:relative;background:linear-gradient(180deg,#151C28 0%,#10151D 92%)}
+.brand-dark .hero::before{content:"";position:absolute;top:-150px;right:-160px;width:560px;height:560px;border-radius:50%;pointer-events:none;opacity:.9;background:repeating-conic-gradient(from 18deg,rgba(255,255,255,.05) 0 32deg,transparent 32deg 36deg),conic-gradient(from 18deg,rgba(23,104,233,.13) 0 32deg,transparent 32deg);-webkit-mask:radial-gradient(closest-side,transparent 57%,#000 60%,#000 93%,transparent 96%);mask:radial-gradient(closest-side,transparent 57%,#000 60%,#000 93%,transparent 96%)}
+.brand-dark .hero h1{font-weight:700}
+.brand-dark .hero h1 em{color:var(--accent-2)}
+.brand-dark .hero-note{color:#7E8B9E}
+.brand-dark .btn-secondary{background:rgba(255,255,255,.05);color:var(--text);border-color:rgba(255,255,255,.16)}
+.brand-dark .btn-secondary:hover{border-color:rgba(255,255,255,.34)}
+.brand-dark .btn-primary:hover{background:#337AEC}
+.brand-dark .hero .btn-secondary{background:none;border-color:transparent;color:var(--accent-2)}
+
+/* ---- 轮盘预览窗：品牌 glass 深色（默认毛玻璃 = 产品 glass 主题的暗色实况） ---- */
+.brand-dark .demo-window{border-color:rgba(255,255,255,.1);background:#131822;box-shadow:0 28px 72px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.06) inset}
+.brand-dark .demo-toolbar{background:#161C27;border-bottom-color:rgba(255,255,255,.07);color:var(--muted)}
+.brand-dark .demo-desktop{background:radial-gradient(ellipse at 72% 16%,rgba(125,181,244,.09),transparent 55%),radial-gradient(ellipse at 16% 88%,rgba(23,104,233,.08),transparent 60%),linear-gradient(150deg,#1B2331,#121722)}
+.brand-dark .demo-file{color:var(--text)}
+.brand-dark .demo-file svg{color:#7DB5F4}
+.brand-dark .demo-file small{color:#7E8B9E}
+.brand-dark .demo-window.theme-glass .demo-desktop{background:radial-gradient(ellipse at 72% 16%,rgba(125,181,244,.09),transparent 55%),radial-gradient(ellipse at 16% 88%,rgba(23,104,233,.08),transparent 60%),linear-gradient(150deg,#1B2331,#121722)}
+.brand-dark .demo-window.theme-glass .radial-wheel{box-shadow:0 18px 36px rgba(0,0,0,.45)}
+.brand-dark .demo-window.theme-glass .radial-base{background:repeating-conic-gradient(from -18deg,transparent 0 35.6deg,rgba(255,255,255,.5) 35.6deg 36deg),rgba(255,255,255,.07);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%);border-color:rgba(255,255,255,.38);box-shadow:inset 0 1px 2px rgba(255,255,255,.28),0 16px 40px rgba(0,0,0,.42)}
+.brand-dark .demo-window.theme-glass .radial-base::after{border-color:rgba(255,255,255,.3)}
+.brand-dark .demo-window.theme-glass .radial-hub{background:rgba(10,18,28,.78);border-color:rgba(255,255,255,.3);box-shadow:0 0 0 5px rgba(255,255,255,.06)}
+/* 暗色毛玻璃同款强化：亮化 accent 填充 + 白色发丝描边，选中扇区与邻区硬分离。 */
+.brand-dark .demo-window.theme-glass .radial-hl{background:conic-gradient(from -18deg,rgba(255,255,255,.92) 0 1.1deg,transparent 1.1deg 34.9deg,rgba(255,255,255,.92) 34.9deg 36deg),conic-gradient(from -18deg,rgba(46,123,240,.92) 0 36deg,transparent 36deg)}
+.brand-dark .demo-window.theme-glass .demo-desktop::before{opacity:1;background:linear-gradient(145deg,transparent 0 40%,rgba(255,255,255,.04) 40% 53%,transparent 53%),linear-gradient(35deg,transparent 0 55%,rgba(255,255,255,.05) 55% 70%,transparent 70%)}
+.brand-dark .radial-hub{background:#141A24;border-color:rgba(255,255,255,.24)}
+.brand-dark .radial-hub svg{color:#A9C7F5}
+.brand-dark .radial-label{color:#C3CCDA}
+.brand-dark .radial-label:hover{color:#FFFFFF}
+.brand-dark .radial-label.is-target{color:#FFFFFF}
+.brand-dark .demo-status{color:#BBD4FB;background:rgba(23,104,233,.14);border-color:rgba(23,104,233,.4)}
+.brand-dark .demo-footer{background:#141A24;border-top-color:rgba(255,255,255,.06);color:#7E8B9E}
+.brand-dark .status-dot{background:var(--accent-2)}
+.brand-dark .demo-disclaimer{color:#7E8B9E}
+.brand-dark .demo-themes{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+.brand-dark .demo-themes button{color:var(--muted)}
+.brand-dark .demo-themes button[aria-pressed=true]{background:rgba(255,255,255,.1);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+/* 预览「浅色」档（App 内 light 主题）在暗页上保持真实浅色外观 */
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark){background:#F6F8FB;border-color:#E1E5EC;color:#1D2027}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .demo-toolbar{background:#FFFFFF;color:#6D7380;border-bottom-color:#E1E5EC}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .demo-desktop{background:radial-gradient(ellipse at 50% 100%,#C6DCFF,transparent 65%),#EEF3FB}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .demo-file{color:#1D2027}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .demo-file small{color:#6D7380}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .demo-file svg{color:#1768E9}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .radial-base{background:repeating-conic-gradient(from -18deg,transparent 0 35.6deg,#E1E5EC 35.6deg 36deg),#FFFFFF;border-color:#E1E5EC}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .radial-base::after{border-color:#E1E5EC}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .radial-hub{background:#FFFFFF;border-color:#E1E5EC;box-shadow:0 0 0 5px #F6F8FB}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .radial-hub svg{color:#1768E9}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .radial-label{color:#6D7380}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .radial-label:hover{color:#1D2027}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .radial-label.is-target{color:#1D2027}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .demo-status{color:#1768E9;background:#FFFFFF;border-color:#E1E5EC}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .demo-footer{background:#FFFFFF;color:#6D7380;border-top-color:#E1E5EC}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .demo-themes{background:#EDF3FE;border-color:#E1E5EC}
+.brand-dark .demo-window:not(.theme-glass):not(.theme-dark) .demo-themes button[aria-pressed=true]{background:#FFFFFF;color:#1D2027}
+@media(prefers-reduced-transparency:reduce){.brand-dark .demo-window.theme-glass .radial-base,.brand-dark .demo-window.theme-glass .radial-hub{background:#1D2531}}
+
+/* ---- 三大卖点卡 + 如实状态卡 ---- */
+.brand-dark .function-index>a{background:linear-gradient(180deg,#18202C,#151B25);border:1px solid rgba(255,255,255,.08);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 34px rgba(0,0,0,.28);transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.brand-dark .function-index>a:hover{border-color:rgba(110,166,244,.45);transform:translateY(-3px);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 22px 44px rgba(0,0,0,.4)}
+.brand-dark .function-index-number{color:var(--accent-2)}
+.brand-dark .function-index-link{color:var(--accent-2)}
+
+/* ---- 功能区分块 ---- */
+.brand-dark .function-section{border-top-color:rgba(255,255,255,.08)}
+.brand-dark .function-number{color:var(--accent-2)}
+.brand-dark .text-link{color:var(--accent-2)}
+.brand-dark .capability-list>article{border-bottom-color:rgba(255,255,255,.08)}
+.brand-dark .function-note{color:#7E8B9E}
+.brand-dark .steps b{background:rgba(110,166,244,.13);color:var(--accent-2)}
+.brand-dark kbd{background:#1B2432;border-color:rgba(255,255,255,.18);border-bottom-color:rgba(255,255,255,.3);color:var(--text)}
+.brand-dark .technical-details{border-bottom-color:rgba(255,255,255,.08)}
+.brand-dark .table-wrap th{background:rgba(255,255,255,.045);color:var(--text)}
+.brand-dark .table-wrap td,.brand-dark .table-wrap th{border-bottom-color:rgba(255,255,255,.08)}
+.brand-dark .table-wrap code{background:rgba(255,255,255,.07);color:#A9C7F5;padding:1px 6px;border-radius:5px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px}
+
+/* ---- 截图钉图示意（纯 CSS 标注纸，暗色面板 + 品牌红标注） ---- */
+.brand-dark .capture-example{background:#131924;border-color:rgba(255,255,255,.08)}
+.brand-dark .capture-example-bar{background:#161D28;border-bottom-color:rgba(255,255,255,.07);color:var(--muted)}
+.brand-dark .capture-example-paper{background:#1A212C;border-color:rgba(255,255,255,.1);box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.brand-dark .capture-example-file{color:#7E8B9E}
+.brand-dark .capture-example-paper strong{color:var(--text)}
+.brand-dark .capture-example-paper p{color:#9AA8BC}
+.brand-dark .capture-example-mark{border-color:#E5533D;color:var(--text)}
+.brand-dark .capture-example-mark span{color:#E5533D}
+.brand-dark .capture-example-tools{background:#161D28;border-top-color:rgba(255,255,255,.07);color:#8A98AC}
+
+/* ---- 跨设备链路 ---- */
+.brand-dark .device-route{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.brand-dark .route-relay{background:#1A212C;border-color:rgba(255,255,255,.14)}
+.brand-dark .route-arrow{color:var(--accent-2)}
+.brand-dark .route-caption{color:#7E8B9E}
+
+/* ---- 链接分享三卡（在用通道为主卡） ---- */
+.brand-dark #share .function-body{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:14px;align-items:stretch}
+.brand-dark .share-option{background:#161D28;border:1px solid rgba(255,255,255,.08);border-radius:16px}
+.brand-dark .share-option:first-child{background:linear-gradient(180deg,rgba(23,104,233,.13),rgba(23,104,233,.03) 70%,#161D28);border-color:rgba(110,166,244,.4)}
+.brand-dark .function-label{color:var(--accent-2)}
+
+/* ---- 数据与权限 / FAQ ---- */
+.brand-dark .privacy,.brand-dark .faq-list,.brand-dark details{border-top-color:rgba(255,255,255,.08)}
+.brand-dark summary span{color:var(--accent-2)}
+.brand-dark details a,.brand-dark .faq-list p a,.brand-dark .section-description a{color:var(--accent-2)}
+
+/* ---- 平台区：五端卡片 + 图标 ---- */
+.brand-dark .platform-list{border-top-color:rgba(255,255,255,.08);gap:16px}
+.brand-dark .platform-list>article{background:#161D28;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;transition:border-color .2s ease}
+.brand-dark .platform-list>article:hover{border-color:rgba(110,166,244,.4)}
+.brand-dark .platform-list h3{font-size:16px;margin-bottom:8px}
+.brand-dark .platform-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:rgba(110,166,244,.1);color:var(--accent-2);margin-bottom:14px}
+.brand-dark .platform-icon svg{width:22px;height:22px}
+.brand-dark .platform-icon img{width:28px;height:28px;border-radius:7px}
+
+/* ---- 下载区：三端卡片（mac 主卡 / win 次卡 / android Release 页） ----
+   两条资产直链与文案选择器不动；download-detect.js 运行时交换的
+   btn-primary/btn-secondary 类与推荐徽标在本主题下均为无害叠加。 */
+.brand-dark .release{position:relative;overflow:hidden;background:linear-gradient(180deg,#151D2A,#11161F);border:1px solid rgba(255,255,255,.09);box-shadow:0 24px 64px rgba(0,0,0,.35)}
+.brand-dark .release::before{content:"";position:absolute;top:-170px;left:50%;transform:translateX(-50%);width:680px;height:330px;background:radial-gradient(ellipse at center,rgba(23,104,233,.16),transparent 70%);pointer-events:none}
+.brand-dark .release>*{position:relative}
+.brand-dark .dl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:34px auto 0;max-width:920px;text-align:left}
+.brand-dark .dl-card{position:relative;display:flex;flex-direction:column;gap:12px;padding:22px 20px;min-height:150px;border-radius:16px;background:#161D28;border:1px solid rgba(255,255,255,.09);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 34px rgba(0,0,0,.25);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.brand-dark .dl-card:hover{transform:translateY(-3px);border-color:rgba(110,166,244,.5);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 22px 44px rgba(0,0,0,.38)}
+.brand-dark .dl-card-mac{background:linear-gradient(180deg,rgba(23,104,233,.17),rgba(23,104,233,.05) 68%,#161D28);border-color:rgba(110,166,244,.45)}
+.brand-dark .dl-card-android{background:#141A24}
+.brand-dark .dl-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.06);color:var(--accent-2)}
+.brand-dark .dl-icon svg{width:24px;height:24px}
+.brand-dark .dl-icon img{width:34px;height:34px;border-radius:8px}
+.brand-dark .dl-name{font-size:15px;font-weight:600;color:var(--text)}
+.brand-dark .dl-name small{display:block;font-size:11px;font-weight:400;color:var(--muted);margin-top:4px;line-height:1.6}
+.brand-dark .dl-action{margin-top:auto;font-size:12px;color:var(--accent-2)}
+.brand-dark .dl-card .btn-badge{position:absolute;top:12px;right:12px;background:rgba(23,104,233,.28);border-color:rgba(255,255,255,.4);color:#EAF2FE}
+.brand-dark .download-help{color:#7E8B9E}
+.brand-dark .download-help a{color:var(--accent-2)}
+
+/* ---- 页脚 ---- */
+.brand-dark footer{border-top-color:rgba(255,255,255,.08)}
+.brand-dark .footer-version{color:#7E8B9E}
+.brand-dark .footer-links a:hover{color:var(--accent-2)}
+
+/* ---- 滚动渐入（原生 IntersectionObserver，index.html 内联脚本挂 html.reveal-on；
+       脚本缺席时无该类，元素恒可见——渐进增强不藏内容） ---- */
+html.reveal-on .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+html.reveal-on .reveal.is-in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){html.reveal-on .reveal{opacity:1;transform:none}}
+
+/* ---- 品牌主题移动端 ---- */
+@media(max-width:1100px){
+.brand-dark #share .function-body{grid-template-columns:1fr;gap:12px}
+.brand-dark .hero::before{width:430px;height:430px;top:-130px;right:-140px}
+}
+@media(max-width:960px){
+.brand-dark .dl-grid{grid-template-columns:1fr;max-width:460px}
+}
+@media(max-width:600px){
+.brand-dark .hero::before{width:340px;height:340px;top:-110px;right:-120px;opacity:.6}
+.brand-dark .platform-list{gap:12px}
+.brand-dark .platform-list>article{padding:16px}
+.brand-dark .platform-icon{width:36px;height:36px;margin-bottom:10px}
+.brand-dark .dl-card{padding:18px 16px;min-height:0}
+.brand-dark .dl-grid{margin-top:26px}
+}

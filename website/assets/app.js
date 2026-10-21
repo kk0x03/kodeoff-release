@@ -69,18 +69,24 @@
     });
     var links = Array.from(d.querySelectorAll('.nav-links a'));
     if ('IntersectionObserver' in window) {
+      var visibleSections = Object.create(null);
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          links.forEach(function (a) {
-            var active = a.hash === '#' + entry.target.id;
-            a.classList.toggle('is-active', active);
-            if (active) a.setAttribute('aria-current', 'location');
-            else a.removeAttribute('aria-current');
-          });
+          visibleSections[entry.target.id] = entry.isIntersecting;
+        });
+        var selected = links.find(function (a) { return a.hash && visibleSections[a.hash.slice(1)]; });
+        links.forEach(function (a) {
+          var active = a === selected;
+          a.classList.toggle('is-active', active);
+          if (active) a.setAttribute('aria-current', 'location');
+          else a.removeAttribute('aria-current');
         });
       }, { rootMargin: '-15% 0px -65% 0px' });
-      links.forEach(function (a) { var target = d.querySelector(a.hash); if (target) io.observe(target); });
+      links.forEach(function (a) {
+        if (!a.hash) return;
+        var target = d.getElementById(a.hash.slice(1));
+        if (target) io.observe(target);
+      });
     }
   }
   function initFaq() {
