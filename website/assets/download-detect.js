@@ -7,8 +7,8 @@
   var FALLBACK_VERSION = '0.1.12';
   var IS_EN = d && /^en\b/i.test(d.documentElement.getAttribute('lang') || '');
   var DETECT_TEXT = IS_EN
-    ? { macos: ' (macOS detected — the macOS build is recommended)', windows: ' (Windows detected — the Windows build is recommended)' }
-    : { macos: '（已检测到 macOS，推荐下载 macOS 版）', windows: '（已检测到 Windows，推荐下载 Windows 版）' };
+    ? { macos: ' (macOS detected — the macOS build is recommended)', windows: ' (Windows detected — the Windows build will be offered here soon)' }
+    : { macos: '（已检测到 macOS，推荐下载 macOS 版）', windows: '（已检测到 Windows，Windows 版将在未来提供）' };
   var BADGE_TEXT = IS_EN ? 'Recommended for your system' : '为你的系统推荐';
 
   function detectOS(ua, touch) {
@@ -50,9 +50,16 @@
     var lede = d.querySelector('#download .download-lede');
     var mac = d.querySelector('#download a[href*="-macOS.dmg"]');
     var win = d.querySelector('#download a[href*="windows-x64"]');
-    var target = os === 'macos' ? mac : os === 'windows' ? win : null;
-    var other = os === 'macos' ? win : mac;
-    if (!target || !other) return;
+    if (os === 'windows') {
+      if (lede && DETECT_TEXT[os] && lede.dataset.winNoted !== '1') {
+        lede.textContent += DETECT_TEXT[os];
+        lede.dataset.winNoted = '1';
+      }
+      return;
+    }
+    var target = mac;
+    var other = win;
+    if (!target) return;
     target.classList.add('btn-primary');
     target.classList.remove('btn-secondary');
     other.classList.add('btn-secondary');

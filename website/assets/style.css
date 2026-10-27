@@ -519,3 +519,14 @@ html.reveal-on .reveal.is-in{opacity:1;transform:none}
 .brand-dark .dl-card{padding:18px 16px;min-height:0}
 .brand-dark .dl-grid{margin-top:26px}
 }
+
+/* 语言切换器（2026-10-25 海外版双语树）：无页头导航的页面（privacy/terms/
+   report/send/app）在正文顶部放一行互链；页头导航页由 .nav-links 承接不适用。 */
+.lang-switch{font-size:13px;margin:0 0 14px}
+.lang-switch a{color:var(--muted)}
+.lang-switch a:hover{color:var(--accent)}
+
+/* Windows/Android 收拢（2026-10-27）：下载入口暂摘，占位卡弱化且不响应悬浮 */
+.brand-dark .dl-card-soon{opacity:.68;filter:saturate(.75)}
+.brand-dark .dl-card-soon:hover{transform:none;border-color:rgba(255,255,255,.09);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 34px rgba(0,0,0,.25)}
+.brand-dark .dl-card-soon .dl-action{color:var(--fg-3,#9AA7B8)}
