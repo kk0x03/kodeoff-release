@@ -1,9 +1,15 @@
-/* 按系统推荐下载 + 版本自动发现（/downloads/SHA256SUMS）。渐进增强：无 JS/失败/未知系统回退页面原状。 */
+/* 按系统推荐下载 + 版本自动发现（/downloads/SHA256SUMS）。渐进增强：无 JS/失败/未知系统回退页面原状。
+   双语树（2026-10-25 海外版）：可见串按页面 <html lang> 出词——en 根树英文、zh 树中文，
+   页面本身不带语言标记时回退中文（与历史行为一致）。 */
 (function () {
   'use strict';
   var d = typeof document !== 'undefined' ? document : null;
-  var FALLBACK_VERSION = '0.1.11';
-  var DETECT_TEXT = { macos: '（已检测到 macOS，推荐下载 macOS 版）', windows: '（已检测到 Windows，推荐下载 Windows 版）' };
+  var FALLBACK_VERSION = '0.1.12';
+  var IS_EN = d && /^en\b/i.test(d.documentElement.getAttribute('lang') || '');
+  var DETECT_TEXT = IS_EN
+    ? { macos: ' (macOS detected — the macOS build is recommended)', windows: ' (Windows detected — the Windows build is recommended)' }
+    : { macos: '（已检测到 macOS，推荐下载 macOS 版）', windows: '（已检测到 Windows，推荐下载 Windows 版）' };
+  var BADGE_TEXT = IS_EN ? 'Recommended for your system' : '为你的系统推荐';
 
   function detectOS(ua, touch) {
     ua = String(ua || '');
@@ -54,7 +60,7 @@
     if (!target.querySelector('.btn-badge')) {
       var badge = d.createElement('span');
       badge.className = 'btn-badge';
-      badge.textContent = '为你的系统推荐';
+      badge.textContent = BADGE_TEXT;
       target.appendChild(badge);
     }
     if (lede && DETECT_TEXT[os]) lede.textContent += DETECT_TEXT[os];
