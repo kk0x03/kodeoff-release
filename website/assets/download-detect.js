@@ -4,7 +4,7 @@
 (function () {
   'use strict';
   var d = typeof document !== 'undefined' ? document : null;
-  var FALLBACK_VERSION = '0.1.12';
+  var FALLBACK_VERSION = '0.1.13';
   var IS_EN = d && /^en\b/i.test(d.documentElement.getAttribute('lang') || '');
   var DETECT_TEXT = IS_EN
     ? { macos: ' (macOS detected — the macOS build is recommended)', windows: ' (Windows detected — the Windows build will be offered here soon)' }
@@ -62,8 +62,10 @@
     if (!target) return;
     target.classList.add('btn-primary');
     target.classList.remove('btn-secondary');
-    other.classList.add('btn-secondary');
-    other.classList.remove('btn-primary');
+    if (other) {
+      other.classList.add('btn-secondary');
+      other.classList.remove('btn-primary');
+    }
     if (!target.querySelector('.btn-badge')) {
       var badge = d.createElement('span');
       badge.className = 'btn-badge';
