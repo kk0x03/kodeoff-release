@@ -1,14 +1,27 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kodeoff：网页登录</title>
-<meta name="description" content="在浏览器中登录 Kodeoff 账号，查看收件箱中的文件与剪贴板文本，可下载、复制、删除与登出。">
+<title>Kodeoff: web sign-in</title>
+<meta name="description" content="Sign in to your Kodeoff account in the browser, view files and clipboard text in the inbox, download, copy, delete, and sign out.">
 <meta name="theme-color" content="#fbfbfd">
-<meta property="og:title" content="Kodeoff：网页登录">
-<meta property="og:description" content="在浏览器中登录 Kodeoff 账号，查看收件箱中的文件与剪贴板文本，可下载、复制、删除与登出。">
+<meta property="og:title" content="Kodeoff: web sign-in">
+<meta property="og:description" content="Sign in to your Kodeoff account in the browser, view files and clipboard text in the inbox, download, copy, delete, and sign out.">
 <meta property="og:type" content="website">
+<link rel="canonical" href="https://www.kodeoff.com/app.html">
+<link rel="alternate" hreflang="en" href="https://www.kodeoff.com/app.html">
+<link rel="alternate" hreflang="zh-CN" href="https://www.kodeoff.com/zh/app.html">
+<link rel="alternate" hreflang="x-default" href="https://www.kodeoff.com/app.html">
+<meta property="og:url" content="https://www.kodeoff.com/app.html">
+<meta property="og:site_name" content="Kodeoff">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.kodeoff.com/assets/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kodeoff — pause on a file and the radial menu appears: local file actions and cross-device transfer">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="stylesheet" href="./assets/style.css">
 <link rel="stylesheet" href="./assets/app-login.css">
@@ -16,208 +29,221 @@
 <script src="./assets/app-login.js" defer></script>
 </head>
 <body class="native" id="top">
-<a class="skip" href="#main">跳到主要内容</a>
+<a class="skip" href="#main">Skip to main content</a>
 <main id="main" class="app-main">
-<p class="back-home"><a href="./index.html">← 返回官网首页</a></p>
+<p class="back-home"><a href="./index.html">← Back to the site home</a> · <a href="./zh/app.html" hreflang="zh-CN">中文</a></p>
 
-<!-- 登录视图：与收件箱视图纯 DOM display 切换，无路由 -->
-<section id="view-login" class="login-wrap" aria-label="登录 Kodeoff">
+<!-- Login view: pure DOM display switching with the inbox view, no routing.
+     Transition note (2026-10-25 English tree): this page’s static UI is
+     English; runtime messages rendered by app-login.js (status lines and the
+     server error table) remain Chinese until the P2 web localization batch —
+     stated honestly below rather than half-translated. -->
+<section id="view-login" class="login-wrap" aria-label="Sign in to Kodeoff">
 <div class="login-card">
-<h1>登录 Kodeoff</h1>
-<p class="muted intro-note">登录后查看设备间收到的文件与剪贴板文本。</p>
-<noscript><p class="note-error">此页面需要启用 JavaScript 才能登录；本页为纯静态页，不加载任何第三方脚本。</p></noscript>
+<h1>Sign in to Kodeoff</h1>
+<p class="muted intro-note">View files and clipboard text received from your devices after signing in.</p>
+<p class="muted intro-note">Note: during this transition, some status and error messages still appear in Chinese.</p>
+<noscript><p class="note-error">Signing in on this page requires JavaScript; this is a purely static page that loads no third-party scripts.</p></noscript>
 <p id="login-notice" class="note-error" aria-live="polite" hidden></p>
 <form id="login-form" novalidate>
 <div id="server-settings" hidden><div class="field">
-<label for="relay-base">服务器地址</label>
+<label for="relay-base">Server address</label>
 <input id="relay-base" type="text" inputmode="url" spellcheck="false" autocomplete="off" placeholder="http://127.0.0.1:18765">
-<p id="relay-warn" class="note-warn" hidden>该地址不是本机回环，HTTPS 页面的浏览器会拦截对它的明文请求；远程服务器需自行配置 TLS（服务端已有 --tls-cert 内置支持）。</p>
+<p id="relay-warn" class="note-warn" hidden>That address is not a loopback address; browsers on HTTPS pages block plaintext requests to it. Remote servers need their own TLS (the server has built-in --tls-cert support).</p>
 </div>
 </div>
-<div id="tab-row" class="tab-group" role="tablist" aria-label="登录方式">
-<button type="button" id="tab-email" role="tab" aria-selected="true" aria-controls="panel-email">邮箱密码</button>
-<button type="button" id="tab-code" role="tab" aria-selected="false" aria-controls="panel-code">账号码</button>
+<div id="tab-row" class="tab-group" role="tablist" aria-label="Sign-in method">
+<button type="button" id="tab-email" role="tab" aria-selected="true" aria-controls="panel-email">Email &amp; password</button>
+<button type="button" id="tab-code" role="tab" aria-selected="false" aria-controls="panel-code">Account code</button>
 </div>
 <div id="panel-email" role="tabpanel" aria-labelledby="tab-email">
 <div class="field">
-<label for="login-email">邮箱</label>
+<label for="login-email">Email</label>
 <input id="login-email" type="email" autocomplete="username" spellcheck="false">
 </div>
 <div class="field">
-<label for="login-password">密码</label>
+<label for="login-password">Password</label>
 <input id="login-password" type="password" autocomplete="current-password">
 </div>
-<!-- 忘记密码入口（W3）：仅 invite+邮箱启用+探针成功出现（app-login.js 与注册
-区块同判据统一切换），open/closed/探针失败一律不出现——门控裁决见 app-login.js
-头注红线与忘记密码段注释。 -->
-<div class="field forgot-row"><button type="button" id="forgot-link" class="linklike" hidden>忘记密码？</button></div>
+<!-- Forgot-password entry (W3): appears only for invite + email enabled +
+     successful probe (app-login.js toggles with the register block on the
+     same criteria); never for open/closed/failed probe — see the red-line
+     notes in app-login.js. -->
+<div class="field forgot-row"><button type="button" id="forgot-link" class="linklike" hidden>Forgot password?</button></div>
 </div>
 <div id="panel-code" role="tabpanel" aria-labelledby="tab-code" hidden>
 <div class="field">
-<label for="login-code">账号码</label>
+<label for="login-code">Account code</label>
 <input id="login-code" type="text" autocomplete="off" spellcheck="false" placeholder="KOD-XXXXX-XXXXX">
 </div>
-<p class="muted field-hint">账号码可在 Mac 端 Kodeoff 设置 → 中继账号页查看。</p>
+<p class="muted field-hint">Your account code is visible in Kodeoff on the Mac under Settings → Relay account.</p>
 </div>
-<p id="email-closed-note" class="note-warn" hidden>此服务器未启用邮箱登录</p>
-<button id="login-submit" type="submit" class="btn btn-primary btn-block">登录</button>
-<p class="disclose">登录凭据保存在此浏览器的本地存储中；本页不加载第三方脚本。在公共电脑上请用完退出——退出会立即清除本机登录，并尝试吊销本浏览器的登录凭据。</p>
+<p id="email-closed-note" class="note-warn" hidden>Email sign-in is not enabled on this server</p>
+<button id="login-submit" type="submit" class="btn btn-primary btn-block">Sign in</button>
+<p class="disclose">Sign-in credentials are stored in this browser’s local storage; this page loads no third-party scripts. On a shared computer, always sign out when done — signing out immediately clears the local login and tries to revoke this browser’s credential.</p>
 </form>
-<!-- 注册区块（内测邀请制）：仅 registration_mode=invite 时由 app-login.js 能力探测
-显示，并按 emailClosed 分两腿：邮箱启用 → 本块邮箱三步流；邮箱关闭 → 账号码注册
-腿 #register-code-block（单请求 /v1/register，见下）。open 模式网页无注册入口（红线
-见 app-login.js 头注），closed/探针失败同隐藏。结构照 panel-email/tab-row/
-email-closed-note 先例：纯静态骨架 + hidden 切换，无路由；动态文案一律 JS
-textContent 渲染（XSS 纪律，app-login.js 头注），本块不含任何服务端可控字符串。 -->
-<section id="register-block" class="register-block" aria-label="注册新账号" hidden>
-<p class="muted register-note">此服务器采用邀请制注册：输入邀请码与邮箱，验证后创建账号。</p>
+<!-- Register block (invite beta): shown by app-login.js capability probing
+     only when registration_mode=invite, with two legs by emailClosed:
+     email enabled → the three-step email flow below; email closed → the
+     account-code leg #register-code-block (a single /v1/register request).
+     In open mode the web has no register entry (see app-login.js header
+     notes); closed or failed probe hides this too. Structure follows the
+     panel-email/tab-row/email-closed-note precedent: static skeleton with
+     hidden switching, no routing; dynamic strings are always rendered by JS
+     via textContent (XSS discipline) — this block contains no
+     server-controllable strings. -->
+<section id="register-block" class="register-block" aria-label="Create a new account" hidden>
+<p class="muted register-note">This server uses invite-only registration: enter an invite code and an email, verify, and create the account.</p>
 <p id="register-notice" class="note-error" aria-live="polite" hidden></p>
 <form id="register-form" novalidate>
 <div id="register-step1">
 <div class="field">
-<label for="reg-invite">邀请码</label>
+<label for="reg-invite">Invite code</label>
 <input id="reg-invite" type="text" autocomplete="off" spellcheck="false" placeholder="INV-XXXXXXXX-XXXXXXXX">
 </div>
 <div class="field">
-<label for="reg-email">邮箱</label>
+<label for="reg-email">Email</label>
 <input id="reg-email" type="email" autocomplete="email" spellcheck="false">
 </div>
-<button id="reg-send" type="submit" class="btn btn-primary btn-block">发送验证码</button>
+<button id="reg-send" type="submit" class="btn btn-primary btn-block">Send verification code</button>
 </div>
 <div id="register-step2" hidden>
 <p id="reg-sent-note" class="register-sent"></p>
 <div class="field">
-<label for="reg-password">设置密码（至少 8 个字符）</label>
+<label for="reg-password">Set a password (at least 8 characters)</label>
 <input id="reg-password" type="password" autocomplete="new-password">
 </div>
 <div class="field">
-<label for="reg-password2">确认密码</label>
+<label for="reg-password2">Confirm password</label>
 <input id="reg-password2" type="password" autocomplete="new-password">
 </div>
 <div class="field">
-<label for="reg-code">邮箱验证码</label>
-<input id="reg-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" placeholder="6 位数字">
+<label for="reg-code">Email verification code</label>
+<input id="reg-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" placeholder="6 digits">
 </div>
-<button id="reg-create" type="submit" class="btn btn-primary btn-block">创建账号</button>
-<!-- 重发验证码（W5，mac 先例 regCodeCountdown=60）：60s 冷却由 app-login.js 假
-时钟可测的前端倒计时驱动，替代「回 step1 重发」的替代性不便；每请求原样回传
-冻结的 email+invite_code，服务端每请求重验邀请码（门在发信配额前），invite 下
-发起与注册发码同一门前置判据。 -->
-<button id="reg-resend" type="button" class="btn btn-secondary btn-block">重新发送验证码</button>
-<button id="reg-back" type="button" class="btn btn-secondary btn-block">返回登录</button>
+<button id="reg-create" type="submit" class="btn btn-primary btn-block">Create account</button>
+<!-- Resend (W5, 60s cooldown driven by app-login.js’s fake-clock-testable
+     countdown; each request replays the frozen email+invite_code, and the
+     server re-validates the invite before the mail-quota gate). -->
+<button id="reg-resend" type="button" class="btn btn-secondary btn-block">Resend code</button>
+<button id="reg-back" type="button" class="btn btn-secondary btn-block">Back to sign in</button>
 </div>
 </form>
 </section>
-<!-- 账号码注册腿（invite+邮箱关闭形态，生产 relay.kodeoff.com 即此形态）：邀请码+
-设备名单请求 POST /v1/register → 201 三件套。服务端邀请码门在字段校验前、端点零
-邮件消费（仅 register_limiter 10/h/IP 桶），网页放行不破发信配额红线——原 W5
-「账号码注册网页表单不补、指路 App」裁决因该形态在浏览器只剩一行死路说明被推翻
-（推翻账见 app-login.js 头注与 applyRegistrationVisibility 段注释）。邀请码前端只
-trim+非空预检：服务端 canonical 纠错收小写/INV- 前缀/连字符/OIL 手抄变体，前端不
-复制规范化逻辑。设备名预填 DEVICE_NAME 默认值可编辑（唯一用途是设备列表辨识）；
-预检 trim 非空+UTF-8 1-128 字节双向（与服务端 text_field 同尺）。显隐由
-applyRegistrationVisibility 统一裁决。 -->
-<section id="register-code-block" class="register-code-block" aria-label="账号码注册" hidden>
-<p class="muted register-note">此服务器采用邀请制注册：输入邀请码与设备名，即刻创建账号码账号。</p>
+<!-- Account-code register leg (invite + email closed — the production
+     relay.kodeoff.com shape): invite code + device name → POST /v1/register
+     → 201 triple. The server checks the invite before field validation and
+     the endpoint consumes no email quota (only the register_limiter 10/h/IP
+     bucket). The invite field is trimmed and checked non-empty client-side;
+     the server’s canonical correction handles lowercase/INV- prefix/hyphen/
+     OIL transcription variants — the front end deliberately duplicates no
+     normalization. Device name pre-fills the DEVICE_NAME default and is
+     editable (its only use is identifying the device in the list); precheck
+     is trim non-empty + UTF-8 1–128 bytes both ways (same size as the
+     server’s text_field). Visibility is decided by
+     applyRegistrationVisibility. -->
+<section id="register-code-block" class="register-code-block" aria-label="Register with account code" hidden>
+<p class="muted register-note">This server uses invite-only registration: enter an invite code and a device name to create an account-code account immediately.</p>
 <p id="register-code-notice" class="note-error" aria-live="polite" hidden></p>
 <form id="register-code-form" novalidate>
 <div class="field">
-<label for="reg-code-invite">邀请码</label>
+<label for="reg-code-invite">Invite code</label>
 <input id="reg-code-invite" type="text" autocomplete="off" spellcheck="false" placeholder="INV-XXXXXXXX-XXXXXXXX">
 </div>
 <div class="field">
-<label for="reg-code-device">设备名</label>
+<label for="reg-code-device">Device name</label>
 <input id="reg-code-device" type="text" autocomplete="off" spellcheck="false" value="Web Browser">
 </div>
-<button id="reg-code-create" type="submit" class="btn btn-primary btn-block">创建账号</button>
+<button id="reg-code-create" type="submit" class="btn btn-primary btn-block">Create account</button>
 </form>
 </section>
-<!-- 注册成功展示卡（账号码腿 201 的强制收尾）：对齐 iOS accountCreatedCard 整页
-二选一语义（RelaySetupView body switch，accountCreatedCard/setupForm 互斥渲染）——
-卡展示期间登录卡可视区归卡独占（登录表单/tab/邮箱关闭提示全隐，显隐边界见
-app-login.js showAccountCreatedCard），进入收件箱/登出/凭据吊销三入口经
-resetAccountCreatedCard 复原。披露行（粗体）为网页单端冻结串（iOS 的唯一凭据语义
-由 caption 与警告两行承载，此串仅网页可见）；警告两行与「账号码（登录凭据）」
-caption 与 iOS 可见文案逐字同串。account_code 经 JS textContent 渲染（服务端可控
-串，XSS 纪律）。 -->
-<section id="account-created-block" class="account-created-block" aria-label="账号已创建" hidden>
-<h2>账号已创建</h2>
+<!-- Account-created card (mandatory ending of the account-code leg’s 201):
+     while the card is shown it owns the visible area of the login card (the
+     sign-in form/tabs/email-closed note all hide; see showAccountCreatedCard
+     in app-login.js). The bold disclosure line is a web-only string; the two
+     warning lines and the “Account code (sign-in credential)” caption match
+     the iOS-visible copies verbatim (Chinese until the P2 localization
+     batch, like every runtime string in app-login.js). account_code is
+     rendered by JS via textContent (server-controllable string, XSS
+     discipline). -->
+<section id="account-created-block" class="account-created-block" aria-label="Account created" hidden>
+<h2>Account created</h2>
 <div id="created-account-code" class="account-code-hero"></div>
-<p class="muted created-caption">账号码（登录凭据）</p>
-<p class="created-copy-row"><button id="created-copy" type="button" class="btn btn-secondary">复制账号码</button></p>
-<!-- 复制第三层兜底提示（clipboard reject + execCommand 均败时出现；文案 JS
-textContent 渲染。user-select:all 保底点按全选恒可达，本行只在双层皆败时上屏） -->
+<p class="muted created-caption">Account code (sign-in credential)</p>
+<p class="created-copy-row"><button id="created-copy" type="button" class="btn btn-secondary">Copy account code</button></p>
 <p id="created-copy-note" class="note-warn" hidden></p>
 <div class="created-warn">
-<p class="created-warn-lead">此账号未绑定邮箱、未设密码：账号码是唯一登录凭据。</p>
-<p class="muted">⚠️ 请立即抄录保存账号码：为其他设备配对时需要它</p>
-<p class="created-warn-fatal">若所有设备都被移除且账号码遗失，将无法再访问此账号</p>
+<p class="created-warn-lead">This account has no email and no password: the account code is the only sign-in credential.</p>
+<p class="muted">⚠️ Write the account code down right now — pairing other devices requires it</p>
+<p class="created-warn-fatal">If all devices are removed and the account code is lost, the account can never be accessed again</p>
 </div>
-<button id="created-enter" type="button" class="btn btn-primary btn-block">进入收件箱</button>
+<button id="created-enter" type="button" class="btn btn-primary btn-block">Enter the inbox</button>
 </section>
-<!-- 忘记密码区块（W3 补腿；两步：/v1/email/reset/code → /v1/email/reset）：
-入口与注册区块同判据（invite+邮箱启用+探针成功，applyRegistrationVisibility 统一
-切换）。结构照 register-block 先例：纯静态骨架 + hidden 切换，无路由；动态文案
-（邮箱/错误 message）一律 JS textContent 渲染（XSS 纪律，app-login.js 头注），
-本块不含任何服务端可控字符串。 -->
-<section id="forgot-block" class="register-block" aria-label="重置密码" hidden>
-<p class="muted register-note">输入注册邮箱获取验证码，确认后设置新密码；重置成功后该账号的全部设备需用新密码重新登录。</p>
+<!-- Forgot-password block (W3; two steps: /v1/email/reset/code →
+     /v1/email/reset): same visibility criteria as the register block
+     (invite + email enabled + probe success, unified through
+     applyRegistrationVisibility). Static skeleton with hidden switching, no
+     routing; dynamic strings (email/error message) are always rendered by JS
+     via textContent — no server-controllable strings here. -->
+<section id="forgot-block" class="register-block" aria-label="Reset password" hidden>
+<p class="muted register-note">Enter the registered email to get a verification code, then set a new password; after a successful reset, every device on the account must sign in again with the new password.</p>
 <p id="forgot-notice" class="note-error" aria-live="polite" hidden></p>
 <form id="forgot-form" novalidate>
 <div id="forgot-step1">
 <div class="field">
-<label for="forgot-email">邮箱</label>
+<label for="forgot-email">Email</label>
 <input id="forgot-email" type="email" autocomplete="email" spellcheck="false">
 </div>
-<button id="forgot-send" type="submit" class="btn btn-primary btn-block">发送验证码</button>
+<button id="forgot-send" type="submit" class="btn btn-primary btn-block">Send verification code</button>
 </div>
 <div id="forgot-step2" hidden>
 <p id="forgot-sent-note" class="register-sent"></p>
 <div class="field">
-<label for="forgot-password">新密码（至少 8 个字符）</label>
+<label for="forgot-password">New password (at least 8 characters)</label>
 <input id="forgot-password" type="password" autocomplete="new-password">
 </div>
 <div class="field">
-<label for="forgot-password2">确认新密码</label>
+<label for="forgot-password2">Confirm new password</label>
 <input id="forgot-password2" type="password" autocomplete="new-password">
 </div>
 <div class="field">
-<label for="forgot-code">邮箱验证码</label>
-<input id="forgot-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" placeholder="6 位数字">
+<label for="forgot-code">Email verification code</label>
+<input id="forgot-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" placeholder="6 digits">
 </div>
-<button id="forgot-create" type="submit" class="btn btn-primary btn-block">重置密码</button>
-<button id="forgot-back" type="button" class="btn btn-secondary btn-block">返回登录</button>
+<button id="forgot-create" type="submit" class="btn btn-primary btn-block">Reset password</button>
+<button id="forgot-back" type="button" class="btn btn-secondary btn-block">Back to sign in</button>
 </div>
 </form>
 </section>
 </div>
 </section>
 
-<!-- 收件箱视图 -->
-<section id="view-inbox" aria-label="收件箱" hidden>
+<!-- Inbox view -->
+<section id="view-inbox" aria-label="Inbox" hidden>
 <div class="inbox-head">
-<h1>收件箱</h1>
+<h1>Inbox</h1>
 <p id="account-line" class="muted account-line"></p>
 <div class="inbox-actions">
-<button id="btn-refresh" type="button" class="btn btn-secondary">刷新</button>
-<button id="btn-upload" type="button" class="btn btn-secondary">上传文件</button>
-<button id="btn-logout" type="button" class="btn btn-secondary">登出</button>
-<!-- 上传区块（发送能力收编收件箱，与刷新/登出同级）：按钮只触发下方隐藏的
-file input，进度/结果文案全走 #inbox-status（textContent 渲染），本块零服务端
-可控字符串。input 不带 btn 类，平时由 [hidden] 钉死规则（app-login.css 首段）
-保持不可见；上传流程、上限与错误矩阵见 app-login.js 上传段注释。 -->
+<button id="btn-refresh" type="button" class="btn btn-secondary">Refresh</button>
+<button id="btn-upload" type="button" class="btn btn-secondary">Upload file</button>
+<button id="btn-logout" type="button" class="btn btn-secondary">Sign out</button>
+<!-- Upload block (sending folded into the inbox, same level as refresh/
+     logout): the button only triggers the hidden file input below; progress
+     and result text all go through #inbox-status (textContent-rendered), so
+     this block has zero server-controllable strings. The input carries no
+     btn class and stays invisible via the [hidden] rule in app-login.css. -->
 <input id="upload-input" type="file" hidden>
 </div>
-<p class="disclose">凭据保存在此浏览器本地存储；退出会立即清除本机登录，并尝试吊销本浏览器的登录凭据。</p>
+<p class="disclose">Credentials are stored in this browser’s local storage; signing out immediately clears the local login and tries to revoke this browser’s credential.</p>
 </div>
 <p id="inbox-status" class="status" aria-live="polite"></p>
 <div id="inbox-empty" class="empty-card" hidden>
-<p>收件箱是空的。在 Mac 上通过 Kodeoff 发送文件、或复制文本，内容会出现在这里。</p>
+<p>The inbox is empty. Send a file or copy text from Kodeoff on your Mac and it will show up here.</p>
 </div>
 <div id="inbox-list"></div>
-<div class="more-wrap"><button id="btn-more" type="button" class="btn btn-secondary" hidden>显示更多</button></div>
+<div class="more-wrap"><button id="btn-more" type="button" class="btn btn-secondary" hidden>Show more</button></div>
 </section>
 </main>
-<footer><a class="brand" href="./index.html"><img src="./favicon.svg" width="28" height="28" alt="">Kodeoff</a><div class="footer-links"><a href="./index.html">首页</a><a href="./docs.html">使用说明</a><a href="./privacy.html">隐私</a><a href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener">版本记录</a><a href="https://github.com/kk0x03/kodeoff-release/issues" target="_blank" rel="noopener">反馈问题</a></div></footer>
+<footer><a class="brand" href="./index.html"><img src="./favicon.svg" width="28" height="28" alt="">Kodeoff</a><div class="footer-links"><a href="./index.html">Home</a><a href="./docs.html">Guides</a><a href="./privacy.html">Privacy</a><a href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener">Releases</a><a href="https://github.com/kk0x03/kodeoff-release/issues" target="_blank" rel="noopener">Report an issue</a><a href="./zh/app.html" hreflang="zh-CN">中文</a></div></footer>
 </body>
 </html>

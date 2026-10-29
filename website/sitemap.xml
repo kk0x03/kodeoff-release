@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodeoff sitemap（2026-10-25 海外版双语树起建）：根=英文、/zh/=中文，
+     双树文件名 1:1；URL 集与各页 canonical 逐字符一致（index 以 / 规范形态），
+     由 website/check.sh 断言三方相等（sitemap == canonical == 双树页集合）。
+     404.html 是错误页、downloads/ 是二进制存档、concepts/ 是设计稿——
+     一律不进 sitemap。 -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>https://www.kodeoff.com/</loc></url>
+<url><loc>https://www.kodeoff.com/wheel.html</loc></url>
+<url><loc>https://www.kodeoff.com/sync.html</loc></url>
+<url><loc>https://www.kodeoff.com/docs.html</loc></url>
+<url><loc>https://www.kodeoff.com/app.html</loc></url>
+<url><loc>https://www.kodeoff.com/privacy.html</loc></url>
+<url><loc>https://www.kodeoff.com/terms.html</loc></url>
+<url><loc>https://www.kodeoff.com/report.html</loc></url>
+<url><loc>https://www.kodeoff.com/send.html</loc></url>
+<url><loc>https://www.kodeoff.com/zh/</loc></url>
+<url><loc>https://www.kodeoff.com/zh/wheel.html</loc></url>
+<url><loc>https://www.kodeoff.com/zh/sync.html</loc></url>
+<url><loc>https://www.kodeoff.com/zh/docs.html</loc></url>
+<url><loc>https://www.kodeoff.com/zh/app.html</loc></url>
+<url><loc>https://www.kodeoff.com/zh/privacy.html</loc></url>
+<url><loc>https://www.kodeoff.com/zh/terms.html</loc></url>
+<url><loc>https://www.kodeoff.com/zh/report.html</loc></url>
+<url><loc>https://www.kodeoff.com/zh/send.html</loc></url>
+</urlset>

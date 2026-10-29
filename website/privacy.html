@@ -1,121 +1,135 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kodeoff：隐私政策</title>
-<meta name="description" content="了解 Kodeoff 官方服务与自建中继的数据处理、本机凭据、缓存、权限和传输安全。">
+<title>Kodeoff: privacy policy</title>
+<meta name="description" content="How the official Kodeoff service and self-hosted relays handle data: local credentials, cache, permissions, and transport security.">
 <meta name="theme-color" content="#fbfbfd">
-<meta property="og:title" content="Kodeoff：隐私政策">
-<meta property="og:description" content="了解 Kodeoff 官方服务与自建中继的数据处理、本机凭据、缓存和传输安全。">
+<meta property="og:title" content="Kodeoff: privacy policy">
+<meta property="og:description" content="How the official Kodeoff service and self-hosted relays handle data: local credentials, cache, permissions, and transport security.">
 <meta property="og:type" content="website">
+<link rel="canonical" href="https://www.kodeoff.com/privacy.html">
+<link rel="alternate" hreflang="en" href="https://www.kodeoff.com/privacy.html">
+<link rel="alternate" hreflang="zh-CN" href="https://www.kodeoff.com/zh/privacy.html">
+<link rel="alternate" hreflang="x-default" href="https://www.kodeoff.com/privacy.html">
+<meta property="og:url" content="https://www.kodeoff.com/privacy.html">
+<meta property="og:site_name" content="Kodeoff">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.kodeoff.com/assets/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kodeoff — pause on a file and the radial menu appears: local file actions and cross-device transfer">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body class="native" id="top">
-<a class="skip" href="#main">跳到主要内容</a>
+<a class="skip" href="#main">Skip to main content</a>
 <main id="main">
+<p class="lang-switch"><a href="./zh/privacy.html" hreflang="zh-CN">中文</a></p>
 <section class="section privacy" id="policy">
 <div>
-<h2>隐私政策</h2>
-<p class="section-description">更新日期：2026-10-15。本页说明 Kodeoff 官方账号中继服务、官网免登录文件分享通道以及自建中继通道，覆盖 iOS、macOS 和网页客户端。iOS 商店构建连接官方 HTTPS 服务；专用自建构建的数据由所选服务器运营者处理。</p>
-<p class="section-description"><strong>快速版本</strong></p>
-<p class="section-description">邮箱、账号信息、文件与剪贴板文本会传输到当前连接的中继服务器。服务器运营者可以访问所存储的数据；使用自建服务时，请确认该服务器由你信任的人运营。</p>
-<p class="section-description">当前 App 没有第三方分析、广告或追踪组件。设备间收发不等于端到端加密，服务器的数据处理方式同样影响隐私。</p>
+<h2>Privacy policy</h2>
+<p class="section-description">Last updated: 2026-10-15. This page covers the official Kodeoff account relay, the website’s no-signup file-sharing channel, and self-hosted relays, across the iOS, macOS, and web clients. The iOS App Store build connects to the official HTTPS service; data of dedicated self-hosted builds is handled by the operator of the chosen server.</p>
+<p class="section-description"><strong>The short version</strong></p>
+<p class="section-description">Email, account information, files, and clipboard text are transmitted to the relay server you are currently connected to. The server operator can access the stored data; when using a self-hosted service, make sure the server is run by someone you trust.</p>
+<p class="section-description">The app currently contains no third-party analytics, advertising, or tracking components. Sending between devices is not end-to-end encryption — how the server handles data also affects your privacy.</p>
 </div>
 <div class="privacy-copy">
 
 <article id="s1">
-<h3>1. 适用范围</h3>
-<p>Kodeoff 官方服务由开发者 Kai Yu 运营，通过 https://relay.kodeoff.com 连接同一账号的设备。开发者及其授权管理员为提供和维护服务可以访问官方服务器上的账号、设备、文件与运行信息。使用自建中继时，数据由你选择的服务器运营者处理，开发者不会因提供客户端自动获得该服务器上的数据。</p>
-<p>App 内不集成任何第三方 SDK，不包含分析、广告或追踪组件。随 App 附带的隐私清单文件（<code>PrivacyInfo.xcprivacy</code>）按保守口径申报了账号中继涉及的数据类别（如邮箱标识、设备与账号标识、用户文件内容、诊断信息等，均不用于追踪）；官方服务处理并存储这些数据，用于账号验证、设备管理、文件与文本传输、安全和故障排查，不用于广告或跨应用追踪。自建服务则由相应运营者负责。</p>
+<h3>1. Scope</h3>
+<p>The official Kodeoff service is operated by the developer, Kai Yu, and connects devices of the same account via https://relay.kodeoff.com. The developer and authorized administrators may access account, device, file, and operational information on the official servers to provide and maintain the service. When using a self-hosted relay, data is handled by the operator of the server you chose; providing the clients does not automatically give the developer access to that server’s data.</p>
+<p>The app embeds no third-party SDKs and contains no analytics, advertising, or tracking components. The privacy manifest bundled with the app (<code>PrivacyInfo.xcprivacy</code>) conservatively declares the data categories involved in the account relay (email identifier, device and account identifiers, user file content, diagnostics — none used for tracking); the official service processes and stores this data for account verification, device management, file and text transfer, security, and troubleshooting — not for advertising or cross-app tracking. Self-hosted services are the responsibility of their operators.</p>
 </article>
 
 <article id="s2">
-<h3>2. 数据去向与用途</h3>
-<p>账号登录与中继收发连接构建内置的官方服务或专用构建中选定的自建服务器。主动打开文档、隐私页或反馈链接时，会通过浏览器访问相应网站。下表说明中继通道处理的数据。</p>
+<h3>2. Where data goes and why</h3>
+<p>Account login and relay transfer connect to the official service built into the build, or to the self-hosted server chosen in a dedicated build. Opening documentation, this policy, or feedback links visits those websites through your browser. The table below describes the data handled by the relay channel.</p>
 <div class="table-wrap">
 <table>
 <thead>
-<tr><th scope="col">数据</th><th scope="col">何时产生</th><th scope="col">去向与存储</th></tr>
+<tr><th scope="col">Data</th><th scope="col">When it arises</th><th scope="col">Destination &amp; storage</th></tr>
 </thead>
 <tbody>
-<tr><td>服务器地址</td><td>在高级设置中指定自建服务，或由构建内置默认值</td><td>保存在构建配置或本机偏好中，用于建立连接；凭据同时记录所属服务器</td></tr>
-<tr><td>邮箱与密码</td><td>邮箱注册、登录、找回密码</td><td>传输到当前连接的中继服务器核验；服务器只保存密码的慢哈希（scrypt），不存明文；官方服务通过 Resend 发送验证邮件</td></tr>
-<tr><td>账号码（KOD-XXXXX-XXXXX）</td><td>注册时由服务器生成</td><td>作为账号身份标识存于当前连接的服务器；本机偏好留存一份用于显示</td></tr>
-<tr><td>设备名</td><td>注册 / 配对新设备时填写（预填本机名称，可修改）</td><td>存于当前连接的服务器，用于在设备列表与投递来源中区分设备</td></tr>
-<tr><td>设备登录凭据（device token）</td><td>登录成功后由服务器签发</td><td>iOS 存于系统钥匙串，macOS 存于本机受限权限的固定文件，网页存于浏览器本地存储；服务器只存其 SHA-256 摘要</td></tr>
-<tr><td>文件与剪贴板文本</td><td>你在设备间发送时</td><td>经当前连接的服务器中转并存储；官方服务保留至你删除内容或账号，自建服务按运营者的保留策略处理</td></tr>
-<tr><td>操作偏好（下载策略、缓存保留天数等）</td><td>使用 App 时</td><td>只存本机，不出设备</td></tr>
-<tr><td>连接与活动信息</td><td>请求中继服务时</td><td>服务器记录设备活动时间，并可能在安全或访问日志中记录来源 IP、请求路径、状态和耗时；反向代理也可能记录访问日志</td></tr>
+<tr><td>Server address</td><td>Set in advanced settings for a self-hosted service, or the built-in default of the build</td><td>Stored in the build configuration or local preferences, used to connect; credentials also record the server they belong to</td></tr>
+<tr><td>Email &amp; password</td><td>Email registration, login, password recovery</td><td>Transmitted to the currently connected relay for verification; the server stores only a slow hash of the password (scrypt), never plaintext; the official service sends verification email via Resend</td></tr>
+<tr><td>Account code (KOD-XXXXX-XXXXX)</td><td>Generated by the server at registration</td><td>Stored as the account identity on the current server; a copy is kept in local preferences for display</td></tr>
+<tr><td>Device name</td><td>Entered when registering or pairing a new device (pre-filled with the machine name, editable)</td><td>Stored on the current server to tell devices apart in the device list and delivery sources</td></tr>
+<tr><td>Device login credential (device token)</td><td>Issued by the server after successful login</td><td>iOS keeps it in the system keychain, macOS in a fixed file with restricted permissions, the web in browser local storage; the server stores only its SHA-256 digest</td></tr>
+<tr><td>Files &amp; clipboard text</td><td>When you send between devices</td><td>Relayed and stored via the current server; the official service keeps them until you delete the content or the account; self-hosted services follow the operator’s retention policy</td></tr>
+<tr><td>Operation preferences (download policy, cache retention days, etc.)</td><td>While using the app</td><td>Stored locally only, never leaves the device</td></tr>
+<tr><td>Connection &amp; activity information</td><td>When requesting the relay</td><td>The server records device activity times and may record source IP, request path, status, and duration in security or access logs; a reverse proxy may keep access logs too</td></tr>
 </tbody>
 </table>
 </div>
 </article>
 
 <article id="s3">
-<h3>3. 匿名分享（网页免登录上传）</h3>
-<p><strong>通道状态（2026-10-20）</strong>：网页免登录上传已暂停，官网分享页已替换为停服公告页。本节保留，用于说明既有链接（24 小时内自然失效）窗口内的数据处理口径。</p>
-<p>官网的免登录分享页允许不注册账号直接上传单个文件并生成下载链接（<a href="./terms.html">服务条款</a>适用）。此通道处理的内容：文件本体、文件名、文件大小与 SHA-256 校验和——仅为向持有链接的人提供下载，不用于其他目的。</p>
-<p>留存口径：链接自创建起 24 小时内有效，最多可被下载 20 次；到期、下载次数或流量额度用尽，或上传完成前被取消、超时，文件即自动从服务器删除（含服务器副本）。匿名池不做备份，删除后不可恢复。</p>
-<p>不收集的内容：匿名上传不要求账号、邮箱或密码；官方服务在匿名分享通道上不记录访问者 IP。上传完成页展示的一次性管理凭据只存在于你的浏览器页面内存中，服务器只保存其哈希、无法还原；页面关闭后即无法找回。</p>
-<p>举报数据：经下载页「举报滥用」入口或<a href="./report.html">举报指引页</a>提交的链接与描述，仅用于核实与下架处理，不用于其他目的，也不会提供给被举报方。</p>
+<h3>3. Anonymous sharing (no-signup web upload)</h3>
+<p><strong>Channel status (2026-10-20)</strong>: no-signup web upload is paused; the share page has been replaced by a pause notice. This section remains to document how data was handled for existing links during their natural expiry window (24 hours).</p>
+<p>The website’s no-signup share page allowed uploading a single file and generating a download link without registering an account (the <a href="./terms.html">terms of service</a> applied). Content handled by this channel: the file itself, its name, size, and SHA-256 checksum — solely to serve downloads to link holders, for no other purpose.</p>
+<p>Retention: links were valid for 24 hours from creation and up to 20 downloads; on expiry, exhaustion of downloads or traffic quota, cancellation before completion, or timeout, the file was deleted from the server automatically (server copies included). The anonymous pool has no backups; deleted means unrecoverable.</p>
+<p>Not collected: anonymous uploads required no account, email, or password; the official service did not record visitor IPs on this channel. The one-time management credential shown on the upload-complete page existed only in your browser page’s memory — the server stored only its hash and cannot reconstruct it; once the page closed, it was gone.</p>
+<p>Report data: links and descriptions submitted via the download page’s “Report abuse” entry or the <a href="./report.html">reporting guide</a> were used solely for verification and takedown, for no other purpose, and are never shared with the reported party.</p>
 </article>
 
 <article id="s4">
-<h3>4. 无追踪与商店隐私说明</h3>
-<p>没有追踪组件不代表在线服务不处理用户数据。App Store 隐私标签需覆盖实际发布构建以及开发者和合作方能访问的数据；官方服务的商店隐私标签申报邮箱、用户和设备标识、文件内容（含照片、视频、音频和其他用户内容）以及运行诊断信息；这些数据与账号关联，用于 App 功能，不用于追踪。相关定义见 <a href="https://developer.apple.com/app-store/app-privacy-details/" target="_blank" rel="noopener">Apple 的 App 隐私说明</a>。</p>
-<p>App 使用 UserDefaults（理由代码 CA92.1）读写自己的偏好，以及磁盘空间 API（理由代码 E174.1）在下载前检查是否能存下文件。空间不足时会停止下载并提示清理；磁盘容量信息不发送到服务器。两项用途与隐私清单一致。</p>
+<h3>4. No tracking &amp; store privacy notes</h3>
+<p>No tracking components does not mean the online service processes no user data. The App Store privacy label must cover what the actually shipped build — plus the developer and partners — can access: the official service’s label declares email, user and device identifiers, file content (including photos, video, audio, and other user content), and operational diagnostics; this data is linked to the account, used for app functionality, and not used for tracking. Definitions per <a href="https://developer.apple.com/app-store/app-privacy-details/" target="_blank" rel="noopener">Apple’s App privacy details</a>.</p>
+<p>The app uses UserDefaults (reason code CA92.1) for its own preferences, and the disk-space API (reason code E174.1) to check whether a file fits before downloading. When space is short, the download stops and you are asked to free space; disk-capacity information is never sent to the server. Both uses match the privacy manifest.</p>
 </article>
 
 <article id="s5">
-<h3>5. 官方服务状态</h3>
-<p>官方服务地址为 https://relay.kodeoff.com，由 Kai Yu 运营，使用阿里云位于日本东京（ap-northeast-1）的服务器。当前为邀请注册：新账号需要有效邀请码；已有账号可使用邮箱和密码登录。验证码和找回密码邮件通过 Resend 发送，发件地址为 noreply@kodeoff.com。</p>
-<p>邮件服务会处理收件邮箱、邮件内容（含验证码）与投递状态，不接收你的密码或中继文件；邮件相关数据还可能在美国等其他地区处理，具体以提供方的政策为准。Resend 的数据处理说明见 <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">Resend 隐私政策</a>。运营联系与反馈渠道见本页第 10 节。</p>
+<h3>5. Official service status</h3>
+<p>The official service is https://relay.kodeoff.com, operated by Kai Yu on Aliyun servers in Tokyo, Japan (ap-northeast-1). Registration is currently invite-only: new accounts need a valid invite code; existing accounts sign in with email and password. Verification and password-recovery emails are sent via Resend from noreply@kodeoff.com.</p>
+<p>The mail provider processes recipient addresses, message content (including verification codes), and delivery status; it never receives your password or relay files. Mail-related data may also be processed in other regions such as the United States, per the provider’s policy. See the <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">Resend privacy policy</a>. Contact and feedback channels are in section 10 of this page.</p>
 </article>
 
 <article id="s6">
-<h3>6. 本机存储</h3>
-<p>凭据：设备登录凭据存放在 iOS 系统钥匙串中，受系统加密保护；退出登录或凭据被吊销时，该条目随即删除。</p>
-<p>macOS 凭据：保存在 <code>~/Library/Application Support/Kodeoff/credentials.json</code>，目录权限为 0700、文件权限为 0600；App 不读取钥匙串。文件本身不额外加密，同一系统用户下有权限的程序可能读取它。</p>
-<p>网页凭据：保存在当前浏览器的本地存储，退出时清除。请勿在不可信的公共电脑上保持登录。</p>
-<p>偏好：服务器地址、设备 ID、账号码、下载策略、缓存保留天数等存于本机偏好（UserDefaults），属于 App 自身设置。</p>
-<p>收件缓存：已下载的收件内容与离线列表快照存于 App 沙盒内，默认保留 30 天，超期自动清理；你可在「设置 → 本地缓存」中调整保留天数或一键清空。</p>
-<p>照片库：仅在你主动把收到的图片 / 视频保存到「照片」时写入，App 不读取照片库。</p>
+<h3>6. On-device storage</h3>
+<p>Credentials: the device login credential is stored in the iOS system keychain, protected by system encryption; it is deleted promptly on sign-out or revocation.</p>
+<p>macOS credentials: kept in <code>~/Library/Application Support/Kodeoff/credentials.json</code> with directory permissions 0700 and file permissions 0600; the app does not read the keychain. The file itself is not additionally encrypted — programs running as the same system user may read it.</p>
+<p>Web credentials: kept in the current browser’s local storage, cleared on sign-out. Avoid staying signed in on untrusted public computers.</p>
+<p>Preferences: server address, device ID, account code, download policy, cache retention days and the like live in local preferences (UserDefaults) as the app’s own settings.</p>
+<p>Inbox cache: downloaded deliveries and the offline list snapshot live inside the app sandbox, kept for 30 days by default and cleaned automatically after; adjust retention or clear everything under Settings → Local cache.</p>
+<p>Photo library: written only when you actively save a received image/video to Photos; the app never reads your photo library.</p>
 </article>
 
 <article id="s7">
-<h3>7. 权限用途</h3>
-<p>本地网络：用于连接你指定的自建中继服务器（例如局域网内的 Mac 或其他主机）。系统弹窗在首次连接时出现；拒绝后无法连接局域网服务器，不影响其他功能。</p>
-<p>照片库（仅添加）：用于把你选择保存的图片 / 视频写入「照片」。App 不会读取你的照片。</p>
-<p>除以上两项外，App 不申请其他隐私权限。</p>
+<h3>7. What permissions are for</h3>
+<p>Local network: used to reach the self-hosted relay you specified (for example a Mac or other host on your LAN). The system prompt appears on first connection; denying it blocks LAN servers only, nothing else.</p>
+<p>Photo library (add-only): used to write images/videos you chose to save into Photos. The app never reads your photos.</p>
+<p>Beyond these two, the app requests no other privacy permissions.</p>
 </article>
 
 <article id="s8">
-<h3>8. 传输与存储安全的如实说明</h3>
-<p>官方服务使用 HTTPS 传输，邮件提交使用加密 SMTP。当前没有端到端加密：服务器能够读取所存储的文件与元数据。自建服务的安全程度取决于运营者的配置，跨网络使用应配置 TLS；明文 HTTP 仅适合专用开发构建的本地测试。</p>
-<p>在未加密链路上，同一网络内的中间人可以看到传输内容；服务器以明文形式存储文件与元数据（凭据只存哈希）。请据此评估你的部署方式。本 App 不做超出以上事实的任何安全宣称。</p>
+<h3>8. An honest account of transport &amp; storage security</h3>
+<p>The official service uses HTTPS transport and mail is submitted over encrypted SMTP. There is no end-to-end encryption today: the server can read the files and metadata it stores. The security of a self-hosted service depends on its operator’s setup — configure TLS for cross-network use; plaintext HTTP is only fit for local testing in dedicated development builds.</p>
+<p>On an unencrypted link, a man-in-the-middle on the same network can see what is transferred; the server stores files and metadata in plaintext (credentials are stored hashed only). Judge your deployment accordingly. This app makes no security claims beyond these facts.</p>
 </article>
 
 <article id="s9">
-<h3>9. 保留与删除</h3>
-<p>官方服务的在线账号、设备和收件内容保留至你主动删除；账号配额与条数限制用于控制存储。当前未启用定时业务数据备份；运行日志由服务器系统按空间轮换，没有另设按天清理期限。自建服务器的保留策略由其运营者决定。</p>
-<p>删除账号：App 内「设置 → 中继账号 → 删除账号」请求清除在线账号、文件、设备记录与凭据。账号删除不会自动改写既有运行日志或运维人员单独创建的离线副本；涉及此类数据的删除请求请通过第 10 节渠道联系运营者，核验归属后处理。请勿在公开反馈中提供私人文件、密码或验证码。</p>
-<p>账号记录删除后，若文件清理因存储故障未完成，服务会在启动时和每 10 分钟的维护轮次继续尝试。持续失败需要运营者处理，维护日志会记录尚未清理的目录数量。</p>
-<p>退出登录：立即清除本机登录与收件状态，并尝试吊销当前设备凭据；离线时无法保证服务器已收到吊销请求。你可从其他已登录设备移除该设备。退出不删除服务器上供其他设备使用的文件。</p>
-<p>清理缓存：「设置 → 本地缓存 → 清理」随时清空本机已下载的收件与快照。</p>
-<p>卸载 App：会清除 App 沙盒内的偏好与缓存；iOS 钥匙串中的凭据条目不保证随卸载移除（系统行为），建议卸载前先在 App 内退出登录。</p>
+<h3>9. Retention &amp; deletion</h3>
+<p>Online accounts, devices, and inbox content on the official service are kept until you delete them; account quotas and item limits exist to control storage. No scheduled business-data backups are enabled today; operational logs rotate by space on the server system, with no separate per-day cleanup deadline. Retention on self-hosted servers is decided by their operators.</p>
+<p>Deleting your account: in-app Settings → Relay account → Delete account asks the server to clear the online account, files, device records, and credentials. Account deletion does not rewrite existing operational logs or offline copies an operator created separately; for such data, contact the operator through the channels in section 10 — requests are verified before processing. Do not post private files, passwords, or verification codes in public feedback.</p>
+<p>If file cleanup fails to complete due to a storage fault, the service retries at startup and in a maintenance pass every 10 minutes. Persistent failures need operator attention; the maintenance log records the count of directories not yet cleaned.</p>
+<p>Signing out: immediately clears local login and inbox state and tries to revoke the current device credential; when offline, the server may not have received the revocation. You can remove the device from another signed-in one. Signing out does not delete server files used by other devices.</p>
+<p>Clearing the cache: Settings → Local cache → Clear empties downloaded deliveries and snapshots on this device at any time.</p>
+<p>Uninstalling: removes preferences and cache inside the app sandbox; the keychain entry on iOS is not guaranteed to be removed with uninstall (system behavior) — sign out in the app before uninstalling.</p>
 </article>
 
 <article id="s10">
-<h3>10. 政策更新与反馈</h3>
-<p>本政策的更新会发布在本页，并同步更新页面顶部的生效日期。</p>
-<p>反馈渠道：<a href="https://github.com/kk0x03/kodeoff-release/issues" target="_blank" rel="noopener">GitHub Issues（kk0x03/kodeoff-release）</a>。对数据处理方式的疑问或删除请求可经同一渠道提出；仅说明请求类型和公开可用的联系途径，不要公开账号凭据或私人内容。</p>
+<h3>10. Policy updates &amp; feedback</h3>
+<p>Updates to this policy are published on this page, with the effective date at the top updated in the same batch.</p>
+<p>Feedback channel: <a href="https://github.com/kk0x03/kodeoff-release/issues" target="_blank" rel="noopener">GitHub Issues (kk0x03/kodeoff-release)</a>. Questions about data handling or deletion requests go through the same channel; state only the request type and a public contact route — never post account credentials or private content.</p>
 </article>
 
 </div>
 </section>
 </main>
-<footer><a class="brand" href="./index.html"><img src="./favicon.svg" width="28" height="28" alt="">Kodeoff</a><div class="footer-links"><a href="./index.html">首页</a><a href="./docs.html">使用说明</a><a href="./terms.html">条款</a><a href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener">版本记录</a><a href="https://github.com/kk0x03/kodeoff-release/issues" target="_blank" rel="noopener">反馈问题</a></div></footer>
+<footer><a class="brand" href="./index.html"><img src="./favicon.svg" width="28" height="28" alt="">Kodeoff</a><div class="footer-links"><a href="./index.html">Home</a><a href="./docs.html">Guides</a><a href="./terms.html">Terms</a><a href="https://github.com/kk0x03/kodeoff-release/releases" target="_blank" rel="noopener">Releases</a><a href="https://github.com/kk0x03/kodeoff-release/issues" target="_blank" rel="noopener">Report an issue</a><a href="./zh/privacy.html" hreflang="zh-CN">中文</a></div></footer>
 </body>
 </html>

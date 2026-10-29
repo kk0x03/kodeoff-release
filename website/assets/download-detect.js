@@ -4,7 +4,7 @@
 (function () {
   'use strict';
   var d = typeof document !== 'undefined' ? document : null;
-  var FALLBACK_VERSION = '0.1.13';
+  var FALLBACK_VERSION = '0.1.14';
   var IS_EN = d && /^en\b/i.test(d.documentElement.getAttribute('lang') || '');
   var DETECT_TEXT = IS_EN
     ? { macos: ' (macOS detected — the macOS build is recommended)', windows: ' (Windows detected — the Windows build will be offered here soon)' }

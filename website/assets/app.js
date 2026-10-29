@@ -51,11 +51,14 @@
     var head = d.querySelector('.site-head');
     var toggle = d.querySelector('.menu-toggle');
     if (!head || !toggle) return;
+    var I18N = /^en\b/i.test(d.documentElement.getAttribute('lang') || '')
+      ? { labelOpen: 'Open navigation', labelClose: 'Close navigation', textOpen: 'Menu', textClose: 'Close' }
+      : { labelOpen: '展开导航', labelClose: '收起导航', textOpen: '菜单', textClose: '收起' };
     function setOpen(open) {
       head.classList.toggle('menu-open', open);
       toggle.setAttribute('aria-expanded', String(open));
-      toggle.setAttribute('aria-label', open ? '收起导航' : '展开导航');
-      toggle.textContent = open ? '收起' : '菜单';
+      toggle.setAttribute('aria-label', open ? I18N.labelClose : I18N.labelOpen);
+      toggle.textContent = open ? I18N.textClose : I18N.textOpen;
     }
     toggle.addEventListener('click', function () { setOpen(!head.classList.contains('menu-open')); });
     head.querySelectorAll('a').forEach(function (a) {
