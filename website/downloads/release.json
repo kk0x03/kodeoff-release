@@ -1,0 +1,14 @@
+{
+  "version": "0.1.20",
+  "build": "1",
+  "channel": "preview",
+  "default_service_local": false,
+  "default_service_configured": true,
+  "assets": [
+    {
+      "file": "Kodeoff-0.1.20-macOS.dmg",
+      "bytes": 2982542,
+      "sha256": "e32324c07a8b51a9576368c5cdcede83f78bdd6f18baffd4024085a460e333d4"
+    }
+  ]
+}
