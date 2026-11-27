@@ -11,8 +11,8 @@ Kodeoff：macOS 拖拽轮盘工具——拖住文件停一下，光标处弹出 
 | 平台 | 文件 | 要求 |
 |---|---|---|
 | macOS | `Kodeoff-<版本>-macOS.dmg` | macOS 13+（Apple silicon / Intel） |
-| Windows | `Kodeoff-<版本>-windows-x64.zip` | Windows 10+ x64（实验性） |
-| Windows | `Kodeoff-<版本>-windows-x64-native.zip` | 同上（原生编译，内容等价任选其一） |
+| Windows | `Kodeoff-<版本>-windows-x64-electron.zip` | Windows 10+ x64（Electron 构建，官网默认下载；完整解压后运行 Kodeoff.exe） |
+| Windows | `Kodeoff-0.1.20-windows-x64.zip` | 上一版原生构建（备用，完整解压后运行 kodeoff.exe） |
 
 ## macOS 安装与首次打开（ad-hoc 签名，未公证）
 
@@ -24,7 +24,7 @@ Kodeoff：macOS 拖拽轮盘工具——拖住文件停一下，光标处弹出 
 
 ## Windows 首次运行（未数字签名）
 
-SmartScreen 拦截时选「更多信息 → 仍要运行」。解压后双击 kodeoff.exe（单文件绿色软件，无安装、无额外依赖）。设置存 `%APPDATA%\Kodeoff\settings.ini`；卸载 = 删文件 + 删 ini 目录 + 删 HKCU `...\Run` 的 Kodeoff 键。
+SmartScreen 拦截时选「更多信息 → 仍要运行」。Electron 构建：完整解压后双击 Kodeoff.exe（需要同目录的 dll、locales、resources），数据目录 `%APPDATA%\Kodeoff`（与原生版共用）。原生构建：解压后双击 kodeoff.exe（单文件绿色软件，无安装、无额外依赖）。设置存 `%APPDATA%\Kodeoff\settings.ini`；卸载 = 删文件 + 删 ini 目录 + 删 HKCU `...\Run` 的 Kodeoff 键。
 
 > 【如实声明】本产物尚未在任何真机 Windows 上验证。
 
